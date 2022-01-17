@@ -2,8 +2,10 @@
 # DiscordBot
 
 ## Steps to use
-1. Open a terminal and cd to the root directory of the project
-2. Run the command `node index.js`
+1. Have git and node.js installed on your computer
+2. Fork this repo then clone a copy using `git clone https://github.com/carterclark/DiscordBot.git`
+3. Open a terminal and cd to the root directory of the project
+4. Run the command `node index.js`
 
 ## Workflow
 
@@ -30,7 +32,8 @@
 - Check heroku configs: `heroku config`
 - Update heroku configs: `heroku config:set {CONFIG_NAME}={CONFIG_VALUE}`
 - Stop heroku: `heroku ps:scale web=0`
-- Start herkou: `heroku ps:scale web=1`
+- Start heroku: `heroku ps:scale web=1`
+- Reset heroku: `heroku repo:reset -a tranquil-oasis-25105`
 
 ### Links
 [Discord Developer Portal](https://discord.com/developers/applications)
