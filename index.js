@@ -65,11 +65,6 @@ client.on('messageCreate', message => {
                 message.reply(`name: ${message.member.displayName}\nnickname: ${message.member.nickname}`);
             }
         }
-
-
-        // if (message.content.substring(0, 9)) {
-        //     message.reply(`@moderator=${message.content.substring(0, 9)}`)
-        // }
     }
 });
 
