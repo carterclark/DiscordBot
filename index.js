@@ -3,6 +3,7 @@ dotenv.config();
 
 const { Client, Intents } = require(`discord.js`);
 const express = require('express');
+const constants = require("./constants.json");
 
 let port = process.env.PORT;
 if (port == null || port == ``) {
@@ -14,18 +15,11 @@ app.listen(port, function () {
     console.log(`Express server listening on port ${port}`);
 });
 
-// const classList = [`ICS-140`, `ICS-141`, `ICS-225`, `ICS-232`, `ICS-240`, `ICS-251`, `ICS-265`, `MATH-310`, `ICS-
-// ICS-311`, `ICS-325`, `CYBER-332`, `ICS-340`,
-//     `MATH-350`, `ICS-352`, `CYBER-362`, `ICS-365`, `ICS-370`, `ICS-372`, `ICS-382`, `CYBER-412`, 
-// `ICS-425`, `ICS-432`, `ICS-440`, `CYBER-442`, `ICS-452`, `ICS-460`, `ICS-462`, `ICS-471`, `CYBER-498`,
-//     `CYBER-499`, `ICS-499`, `ICS-611`, `CYBER-621`, `CYBER-641`, `CYBER-698`];
-
 var rolesToBeAssigned = [];
 var membersNotToChange = [];
-// var membersToChange = [];
-const topRoles = [`KING`, `Server Booster`, `Industry Expert`, `Moderator`, `dev_boy`];
-const commonRoles = [`Person`, `@everyone`];
-const personRole = `Person`;
+const topRoles = constants.topRoles;
+const commonRoles = constants.commonRoles;
+const personRole = constants.personRole;
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
@@ -33,7 +27,7 @@ const client = new Client({
 });
 
 client.once(`ready`, () => {
-    console.log(`DiscordBot initialized\nFetching member list`);
+    console.log(`DiscordBot initialized, Creating lists`);
 
     const server = client.guilds.cache.get(process.env.GUILD_ID);
 
@@ -43,7 +37,7 @@ client.once(`ready`, () => {
 
             roleName = server.roles.cache.get(roleId.at(0)).name;
 
-            if (topRoles.includes(roleName)) {
+            if (topRoles.includes(roleName) && !membersNotToChange.includes(member.displayName)) {
                 membersNotToChange.push(member.displayName);
                 continue;
             }
@@ -57,7 +51,7 @@ client.once(`ready`, () => {
         }
     });
 
-    console.log(`Completed list creations\n${membersNotToChange}\n${rolesToBeAssigned}`);
+    console.log(`Completed list creations\nmembersNotToChange: ${membersNotToChange}\nrolesToBeAssigned: ${rolesToBeAssigned}`);
 });
 
 client.on('messageCreate', message => {

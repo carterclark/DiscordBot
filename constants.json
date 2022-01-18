@@ -1,0 +1,15 @@
+{
+    "topRoles": [
+        "KING",
+        "Server Booster",
+        "Industry Expert",
+        "Moderator",
+        "dev_boy",
+        "prod_bot"
+    ],
+    "commonRoles": [
+        "Person",
+        "@everyone"
+    ],
+    "personRole": "Person"
+}
