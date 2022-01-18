@@ -56,7 +56,7 @@ client.once(`ready`, () => {
 
 client.on('messageCreate', message => {
 
-    if (membersNotToChange.includes(message.member.displayName)) {
+    if (!membersNotToChange.includes(message.member.displayName)) {
 
         var splitMessage = message.content.split(',').join('').split(` `);
         if (splitMessage.at(0).startsWith('<@') && splitMessage.at(0).endsWith('>')) {
