@@ -16,7 +16,7 @@ app.listen(port, function () {
 });
 
 var rolesToBeAssigned = [];
-var membersNotToChange = [];
+var unchangableNameMemberList = [];
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
@@ -34,70 +34,69 @@ client.once(`ready`, () => {
 
             roleName = server.roles.cache.get(roleId.at(0)).name;
 
-            if (constants.topRoles.includes(roleName) && !membersNotToChange.includes(member.displayName)) {
-                membersNotToChange.push(member.displayName);
+            if (constants.topRoles.includes(roleName) && !unchangableNameMemberList.includes(member.displayName)) {
+                unchangableNameMemberList.push(member.displayName);
                 continue;
             }
         }
     });
 
     server.roles.cache.forEach(role => {
-        if (!constants.topRoles.includes(role.name) && !constants.commonRoles.includes(role.name)) {
+        if (!constants.topRoles.includes(role.name) && constants.everyoneRole != (role.name)) {
             rolesToBeAssigned.push(role.name);
             // console.log(`role added to list to be changed: ${role.name}`);
         }
     });
 
-    console.log(`Completed list creations\nmembersNotToChange: ${membersNotToChange}\nrolesToBeAssigned: ${rolesToBeAssigned}`);
+    console.log(`Completed list creations\nunchangableNameMemberList: ${unchangableNameMemberList}` +
+        `\nrolesToBeAssigned: ${rolesToBeAssigned}`);
 });
 
 client.on('messageCreate', message => {
 
-    if (!membersNotToChange.includes(message.member.displayName)) {
+    var splitMessage = message.content.split(',').join('').split(` `);
+    if (splitMessage.at(0).startsWith('<@') && splitMessage.at(0).endsWith('>')) {
 
-        var splitMessage = message.content.split(',').join('').split(` `);
-        if (splitMessage.at(0).startsWith('<@') && splitMessage.at(0).endsWith('>')) {
+        var roleId = splitMessage.at(0);
+        roleId = roleId.slice(3, -1);
+        const firstElement = message.guild.roles.cache.find(r => r.id === roleId).name;
+        splitMessage.shift(); // get rid of @moderator in array
+        splitMessage.push(constants.personRole);
 
-            var roleId = splitMessage.at(0);
-            roleId = roleId.slice(3, -1);
-            const firstElement = message.guild.roles.cache.find(r => r.id === roleId).name;
-            splitMessage.shift(); // get rid of @moderator in array
+        if (firstElement == `Moderator`) {
+            if (!rolesToBeAssigned.includes(splitMessage.at(0))) {
 
-            if (firstElement == `Moderator`) {
-                if (!rolesToBeAssigned.includes(splitMessage.at(0))) {
+                var personName = ``;
+                var rolesAdded = ``;
 
-                    var personName = ``;
-                    var rolesAdded = ``;
+                for (const messageElement of splitMessage) {
 
-                    for (const messageElement of splitMessage) {
-
-                        if (rolesToBeAssigned.includes(messageElement)) {
-                            let role = message.guild.roles.cache.find(role => role.name === messageElement);
-                            message.member.roles.add(role); constants.personRole
-                            rolesAdded += `, ${role.name}`;
-                        } else {
-                            personName += messageElement + ` `;
-                        }
-                    }
-
-                    if (membersNotToChange.includes(message.member.displayName)) {
-                        personName = `[nickname unchanged, role is above the bot]`
+                    if (rolesToBeAssigned.includes(messageElement)) {
+                        let role = message.guild.roles.cache.find(role => role.name === messageElement);
+                        message.member.roles.add(role); constants.personRole
+                        rolesAdded += `, ${role.name}`;
                     } else {
-                        message.member.setNickname(personName);
+                        personName += messageElement + ` `;
                     }
-                    message.member.roles.add(constants.personRole);
-                    message.reply(`name: ${message.member.displayName}` +
-                        `\nnickname: ${personName}\nroles added: ${rolesAdded.substring(1)}`);
-                } else {
-                    message.reply(`There was a problem with your request. Ask a moderator`);
                 }
+
+                if (unchangableNameMemberList.includes(message.member.displayName)) {
+                    personName = `[nickname unchanged, role is above the bot]`
+                } else {
+                    message.member.setNickname(personName);
+                }
+                message.reply(`name: ${message.member.displayName}` +
+                    `\nnickname: ${personName}\nroles added: ${rolesAdded.substring(1)}`);
+            } else {
+                message.reply(`There was a problem with your request. Ask a moderator`);
             }
         }
     }
+
 });
 
 client.on(`interactionCreate`, async interaction => {
-    if (!interaction.isCommand() || !membersNotToChange.includes(interaction.member.displayName)) return;
+    if (!interaction.isCommand() || !unchangableNameMemberList.includes(interaction.member.displayName)) return;
 
     const { commandName } = interaction;
 
@@ -111,7 +110,7 @@ client.on(`interactionCreate`, async interaction => {
 
             interaction.guild.members.cache.forEach(member => {
                 member.roles.cache.forEach(role => {
-                    if (rolesToBeAssigned.includes(role.name)) {
+                    if (rolesToBeAssigned.includes(role.name) && role.name != constants.personRole) {
                         roleCount++;
                         member.roles.remove(role);
                         console.log(`removing ${role.name} from ${member.displayName}`);

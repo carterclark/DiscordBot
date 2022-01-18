@@ -7,9 +7,6 @@
         "dev_boy",
         "prod_bot"
     ],
-    "commonRoles": [
-        "Person",
-        "@everyone"
-    ],
+    "everyoneRole": "@everyone",
     "personRole": "Person"
 }
