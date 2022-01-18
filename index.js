@@ -23,7 +23,7 @@ app.listen(port, function () {
 var rolesToBeChanged = [];
 var membersNotToChange = [];
 // var membersToChange = [];
-const topRoles = [`KING`, `Server Booster`, `Industry Expert`, `Moderator`];
+const topRoles = [`KING`, `Server Booster`, `Industry Expert`, `Moderator`, `dev_boy`];
 const commonRoles = [`Person`, `@everyone`];
 
 const client = new Client({
@@ -66,32 +66,38 @@ client.on('messageCreate', message => {
 
     if (message.author.username != `Carters_third_born`) {
 
-        var splitMessage = message.content.replace(`,`, ``).split(` `);
+        var splitMessage = message.content.split(',').join('').split(` `);
 
         if (splitMessage.at(0).startsWith('<@') && splitMessage.at(0).endsWith('>')) {
 
             var roleId = splitMessage.at(0);
             roleId = roleId.slice(3, -1);
-
             const roleName = message.guild.roles.cache.find(r => r.id === roleId).name;
             splitMessage.shift(); // get rid of @moderator in array
 
-            if (roleName == `moderator`) {
+            if (roleName == `Moderator`) {
 
                 var personName = ``;
+                var rolesAdded = ``;
                 for (const messageElement of splitMessage) {
 
                     if (rolesToBeChanged.includes(messageElement)) {
                         let role = message.guild.roles.cache.find(role => role.name === messageElement);
                         message.member.roles.add(role);
+                        rolesAdded += `, ${role.name}`;
                     } else {
                         personName += messageElement + ` `;
                     }
 
                 }
 
-                message.member.setNickname(personName);
-                message.reply(`name: ${message.member.displayName}\nnickname: ${message.member.nickname}`);
+                if (membersNotToChange.includes(message.member.displayName)) {
+                    personName = `[nickname unchanged, role too high]`
+                } else {
+                    message.member.setNickname(personName);
+                }
+                message.reply(`name: ${message.member.displayName}` +
+                    `\nnickname: ${personName}\nroles added: ${rolesAdded.substring(1)}`);
             }
         }
     }
@@ -120,8 +126,8 @@ client.on(`interactionCreate`, async interaction => {
                 })
             });
 
-            await interaction.reply(`take_roles removed ${roleCount} roles on channel ` +
-                `${interaction.channel.name}`);
+            await interaction.reply(`take_roles removed ${roleCount} roles from server ` +
+                `${interaction.guild.name}`);
             break;
         }
 
