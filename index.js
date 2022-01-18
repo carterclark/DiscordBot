@@ -17,9 +17,6 @@ app.listen(port, function () {
 
 var rolesToBeAssigned = [];
 var membersNotToChange = [];
-const topRoles = constants.topRoles;
-const commonRoles = constants.commonRoles;
-const personRole = constants.personRole;
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
@@ -37,7 +34,7 @@ client.once(`ready`, () => {
 
             roleName = server.roles.cache.get(roleId.at(0)).name;
 
-            if (topRoles.includes(roleName) && !membersNotToChange.includes(member.displayName)) {
+            if (constants.topRoles.includes(roleName) && !membersNotToChange.includes(member.displayName)) {
                 membersNotToChange.push(member.displayName);
                 continue;
             }
@@ -45,7 +42,7 @@ client.once(`ready`, () => {
     });
 
     server.roles.cache.forEach(role => {
-        if (!topRoles.includes(role.name) && !commonRoles.includes(role.name)) {
+        if (!constants.topRoles.includes(role.name) && !constants.commonRoles.includes(role.name)) {
             rolesToBeAssigned.push(role.name);
             // console.log(`role added to list to be changed: ${role.name}`);
         }
@@ -65,7 +62,6 @@ client.on('messageCreate', message => {
             roleId = roleId.slice(3, -1);
             const firstElement = message.guild.roles.cache.find(r => r.id === roleId).name;
             splitMessage.shift(); // get rid of @moderator in array
-            splitMessage.push(personRole);
 
             if (firstElement == `Moderator`) {
                 if (!rolesToBeAssigned.includes(splitMessage.at(0))) {
@@ -77,7 +73,7 @@ client.on('messageCreate', message => {
 
                         if (rolesToBeAssigned.includes(messageElement)) {
                             let role = message.guild.roles.cache.find(role => role.name === messageElement);
-                            message.member.roles.add(role);
+                            message.member.roles.add(role); constants.personRole
                             rolesAdded += `, ${role.name}`;
                         } else {
                             personName += messageElement + ` `;
@@ -85,10 +81,11 @@ client.on('messageCreate', message => {
                     }
 
                     if (membersNotToChange.includes(message.member.displayName)) {
-                        personName = `[nickname unchanged, role too high]`
+                        personName = `[nickname unchanged, role is above the bot]`
                     } else {
                         message.member.setNickname(personName);
                     }
+                    message.member.roles.add(constants.personRole);
                     message.reply(`name: ${message.member.displayName}` +
                         `\nnickname: ${personName}\nroles added: ${rolesAdded.substring(1)}`);
                 } else {
