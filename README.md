@@ -7,11 +7,11 @@
 2. Fork this repo then clone a copy using `git clone https://github.com/carterclark/DiscordBot.git`
 3. Open a terminal and cd to the root directory of the project
 4. Run `npm install` to download dependancies
-5. Make a `.env` file in the root directory and enter the secrets for: 
+5. Make a `.env` file in the root directory and enter the secrets for:
     * `BOT_AUTH_TOKEN`, can be found in the discord develeper portal. After selecting the app go to Bot.
     * `CLIENT_ID`, can be found in the discord develeper portal. After selecting the app go to OAuth2.
-    * `GUILD_ID`, can be found under `widget` in the server settings on discord
-6. If changing bot commands run `node deploy-commands.js` in the terminal. If not changing bot commands then ignore
+    * `SERVER_ID`, can be found under `widget` in the server settings on discord
+6. If running the bot for the first time or changing bot commands run `node deploy-commands.js` in the terminal.
 7. Run the command `node index.js`
 
 ### Making Discord Bot

@@ -4,9 +4,11 @@
         "Server Booster",
         "Industry Expert",
         "Moderator",
-        "dev_boy",
+        "dev_bot",
         "prod_bot"
     ],
     "everyoneRole": "@everyone",
-    "personRole": "Person"
+    "personRole": "Person",
+    "authChannelName": "authorization",
+    "secretChannelName": "secret-secret"
 }
