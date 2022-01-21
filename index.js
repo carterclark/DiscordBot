@@ -34,7 +34,7 @@ client.once(`ready`, () => {
 
     server.roles.cache.forEach(role => {
         if (!constants.topRoles.includes(role.name) && constants.everyoneRole != (role.name)) {
-            rolesToBeAssigned.push(role.name);
+            rolesToBeAssigned.push(role.name.toUpperCase());
             // console.log(`role added to list to be changed: ${role.name}`);
         }
     });
@@ -64,7 +64,7 @@ client.on('messageCreate', message => {
 
                     for (const messageElement of splitMessage) {
 
-                        if (rolesToBeAssigned.includes(messageElement)) {
+                        if (rolesToBeAssigned.includes(messageElement.toUpperCase())) {
                             let role = message.guild.roles.cache.find(role => role.name === messageElement);
 
                             if (!alreadyHasRole(message.author.username, messageElement)) {
@@ -85,7 +85,7 @@ client.on('messageCreate', message => {
                     message.reply(`name: ${message.member.displayName}` +
                         `\nnickname: ${personName}\nroles added: ${rolesAdded.substring(1)}`);
                 } else {
-                    message.reply(`There was a problem reading your message. \nReminder, the format is "@Moderator [YOUR NAME] [CLASS1], [CLASS2], ..."`);
+                    message.reply(`There was a problem reading your message. \nReminder, the format is ${constants.messageRoleFormat}`);
                 }
             }
         }
@@ -127,15 +127,24 @@ client.on(`interactionCreate`, async interaction => {
         }
 
         case `info`: {
-            let roleString = ``;
-            interaction.guild.roles.cache.forEach(role => roleString += `role name: ` + role.name +
-                `, role id: ` + role.id + `\n`)
 
             await interaction.reply(
                 `Server name: ${interaction.guild.name}\nServer id: ${interaction.guild.id}\n` +
                 `Channel name: ${interaction.channel.name} \nChannel id: ${interaction.channel.id}\n` +
-                roleString +
                 `\nYour tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}`);
+            break;
+        }
+        case `list_roles`: {
+            let roleString = ``;
+            interaction.guild.roles.cache.forEach(role => {
+
+                if (role.name != constants.everyoneRole) {
+                    roleString += `` + role.name + `, `
+                }
+            });
+            roleString = roleString.slice(0, -2);
+
+            await interaction.reply(`roles listed: \n${roleString}`);
             break;
         }
     }

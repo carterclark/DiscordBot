@@ -9,6 +9,7 @@ const commands = [
     new SlashCommandBuilder().setName('ping').setDescription('Replies with pong!'),
     new SlashCommandBuilder().setName('take_roles').setDescription('takes all class roles from everyone'),
     new SlashCommandBuilder().setName('info').setDescription('Replies with info for server, channel, and user'),
+    new SlashCommandBuilder().setName('list_roles').setDescription('Replies with a list of roles in the server')
 ]
     .map(command => command.toJSON());
 
