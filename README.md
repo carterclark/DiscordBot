@@ -3,7 +3,7 @@
 
 ## Steps to use
 
-1. Have git and node.js installed on your computer
+1. Have [git](https://git-scm.com/downloads) and [node.js](https://nodejs.org/en/download/) installed on your computer
 2. Fork this repo then clone a copy using `git clone https://github.com/carterclark/DiscordBot.git`
 3. Open a terminal and cd to the root directory of the project
 4. Run `npm install` to download dependancies
