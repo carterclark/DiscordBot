@@ -95,7 +95,11 @@ client.on('messageCreate', message => {
 
 client.on(`interactionCreate`, async interaction => {
 
-    if (!interaction.isCommand() || !unchangableNameMemberList.includes(interaction.member.displayName)) return;
+    if (!interaction.isCommand()) return;
+    else if (!unchangableNameMemberList.includes(interaction.member.displayName)) {
+        await interaction.reply("Commands for me are only enabled for mods");
+        return;
+    }
     else if (interaction.channel.name != constants.secretChannelName) {
         await interaction.reply("Commands for me are not enabled outside the mod chat");
         return;
@@ -139,12 +143,11 @@ client.on(`interactionCreate`, async interaction => {
             interaction.guild.roles.cache.forEach(role => {
 
                 if (role.name != constants.everyoneRole) {
-                    roleString += `` + role.name + `, `
+                    roleString += `\n` + role.name
                 }
             });
-            roleString = roleString.slice(0, -2);
 
-            await interaction.reply(`roles listed: \n${roleString}`);
+            await interaction.reply(`roles listed: ${roleString}`);
             break;
         }
     }
