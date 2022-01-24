@@ -34,8 +34,7 @@ client.once(`ready`, () => {
 
     server.roles.cache.forEach(role => {
         if (!constants.topRoles.includes(role.name) && constants.everyoneRole != (role.name)) {
-            rolesToBeAssigned.push(role.name.toUpperCase());
-            // console.log(`role added to list to be changed: ${role.name}`);
+            rolesToBeAssigned.push(role.name);
         }
     });
 
@@ -54,9 +53,10 @@ client.on('messageCreate', message => {
             roleId = roleId.slice(3, -1);
             const firstElement = message.guild.roles.cache.find(r => r.id === roleId).name;
             splitMessage.shift(); // get rid of @moderator in array
-            splitMessage.push(constants.personRole);
+            splitMessage.push(constants.personRole); // so person role gets assigned
 
             if (firstElement == `Moderator`) {
+                // to insure the first element is the persons name and not a class
                 if (!rolesToBeAssigned.includes(splitMessage.at(0))) {
 
                     var personName = ``;
@@ -64,12 +64,12 @@ client.on('messageCreate', message => {
 
                     for (const messageElement of splitMessage) {
 
-                        if (rolesToBeAssigned.includes(messageElement.toUpperCase())) {
-                            let role = message.guild.roles.cache.find(role => role.name === messageElement);
+                        if (rolesToBeAssigned.includes(messageElement)) {
 
                             if (!alreadyHasRole(message.author.username, messageElement)) {
+                                let role = findRoleByName(messageElement);
                                 message.member.roles.add(role);
-                                rolesAdded += `, ${role.name}`;
+                                rolesAdded += `, ${role}`;
                             }
 
                         } else {
@@ -177,4 +177,12 @@ function alreadyHasRole(username, roleName) {
 
 
     return hasRole;
+}
+
+function findRoleByName(roleName) {
+    const server = client.guilds.cache.get(process.env.SERVER_ID);
+    let roleFound = server.roles.cache.find(role => role.name === roleName);
+
+    return roleFound;
+
 }
