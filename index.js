@@ -72,7 +72,16 @@ client.on('messageCreate', message => {
                                 rolesAdded += `, ${role}`;
                             }
 
-                        } else {
+                        } else if (rolesToBeAssigned.includes(messageElement.toUpperCase())) {
+                            if (!alreadyHasRole(message.author.username, messageElement.toUpperCase())) {
+                                let role = findRoleByName(messageElement.toUpperCase());
+                                message.member.roles.add(role);
+                                rolesAdded += `, ${role}`;
+                            }
+
+                        }
+
+                        else {
                             personName += messageElement + ` `;
                         }
                     }
