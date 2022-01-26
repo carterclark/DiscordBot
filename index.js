@@ -61,10 +61,12 @@ client.on('messageCreate', message => {
 
                     var personName = ``;
                     var rolesAdded = ``;
+                    var currentlyReadingName = true;
 
                     for (const messageElement of splitMessage) {
 
                         if (rolesToBeAssigned.includes(messageElement)) {
+                            currentlyReadingName = false;
 
                             if (!alreadyHasRole(message.author.username, messageElement)) {
                                 let role = findRoleByName(messageElement);
@@ -73,6 +75,7 @@ client.on('messageCreate', message => {
                             }
 
                         } else if (rolesToBeAssigned.includes(messageElement.toUpperCase())) {
+                            currentlyReadingName = false;
                             if (!alreadyHasRole(message.author.username, messageElement.toUpperCase())) {
                                 let role = findRoleByName(messageElement.toUpperCase());
                                 message.member.roles.add(role);
@@ -81,13 +84,13 @@ client.on('messageCreate', message => {
 
                         }
 
-                        else {
+                        else if (currentlyReadingName) {
                             personName += messageElement + ` `;
                         }
                     }
 
                     if (unchangableNameMemberList.includes(message.member.displayName)) {
-                        personName = `[nickname unchanged, role is above the bot]`
+                        personName = `couldn't change nickename to [${personName}], role is above the bot`
                     } else {
                         message.member.setNickname("");
                         message.member.setNickname(personName);
