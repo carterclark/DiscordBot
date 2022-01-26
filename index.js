@@ -89,6 +89,7 @@ client.on('messageCreate', message => {
                     if (unchangableNameMemberList.includes(message.member.displayName)) {
                         personName = `[nickname unchanged, role is above the bot]`
                     } else {
+                        message.member.setNickname("");
                         message.member.setNickname(personName);
                     }
                     message.reply(`name: ${message.member.displayName}` +
