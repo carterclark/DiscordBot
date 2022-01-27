@@ -17,26 +17,8 @@ client.once(`ready`, () => {
 
     console.log(`DiscordBot initialized on server: ${server.name}\nCreating lists: `);
 
-    var roleName = ``;
-
-
-    server.members.cache.forEach(member => {
-        for (const roleId of member.roles.cache) {
-
-            roleName = server.roles.cache.get(roleId.at(0)).name;
-
-            if (constants.topRoles.includes(roleName) && !unchangableNameMemberList.includes(member.displayName)) {
-                unchangableNameMemberList.push(member.displayName);
-                continue;
-            }
-        }
-    });
-
-    server.roles.cache.forEach(role => {
-        if (!constants.topRoles.includes(role.name) && constants.everyoneRole != (role.name)) {
-            rolesToBeAssigned.push(role.name);
-        }
-    });
+    updateUnchangableNameMemberList();
+    updateRolesToBeAssigned();
 
     console.log(`Completed list creations\nunchangableNameMemberList: ${unchangableNameMemberList}` +
         `\nrolesToBeAssigned: ${rolesToBeAssigned}`);
@@ -56,6 +38,8 @@ client.on('messageCreate', message => {
             splitMessage.push(constants.personRole); // so person role gets assigned
 
             if (firstElement == `Moderator`) {
+                updateUnchangableNameMemberList();
+                updateRolesToBeAssigned();
                 // to insure the first element is the persons name and not a class
                 if (!rolesToBeAssigned.includes(splitMessage.at(0))) {
 
@@ -108,6 +92,8 @@ client.on('messageCreate', message => {
 });
 
 client.on(`interactionCreate`, async interaction => {
+    updateUnchangableNameMemberList();
+    updateRolesToBeAssigned();
 
     if (!interaction.isCommand()) return;
     else if (!unchangableNameMemberList.includes(interaction.member.displayName)) {
@@ -199,4 +185,34 @@ function findRoleByName(roleName) {
 
     return roleFound;
 
+}
+
+function updateUnchangableNameMemberList() {
+
+    const server = client.guilds.cache.get(process.env.SERVER_ID);
+    var roleName = ``;
+
+    server.members.cache.forEach(member => {
+        for (const roleId of member.roles.cache) {
+
+            roleName = server.roles.cache.get(roleId.at(0)).name;
+
+            if (constants.topRoles.includes(roleName) && !unchangableNameMemberList.includes(member.displayName)) {
+                unchangableNameMemberList.push(member.displayName);
+                continue;
+            }
+        }
+    });
+}
+
+function updateRolesToBeAssigned() {
+    const server = client.guilds.cache.get(process.env.SERVER_ID);
+
+    server.roles.cache.forEach(role => {
+        if (!constants.topRoles.includes(role.name) &&
+            constants.everyoneRole != (role.name) &&
+            !rolesToBeAssigned.includes(role.name)) {
+            rolesToBeAssigned.push(role.name);
+        }
+    });
 }
