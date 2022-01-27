@@ -89,6 +89,7 @@ client.on('messageCreate', message => {
                         }
                     }
 
+                    personName = personName.slice(0, -1);
                     if (unchangableNameMemberList.includes(message.member.displayName)) {
                         personName = `couldn't change nickname to [${personName}], role is above the bot`
                     } else {
