@@ -15,12 +15,12 @@ const client = new Client({
 client.once(`ready`, () => {
     const server = client.guilds.cache.get(process.env.SERVER_ID);
 
-    console.log(`DiscordBot initialized on server: ${server.name}\nCreating lists: `);
+    console.log(`DiscordBot initialized on server: ${server.name}`);
 
     updateUnchangableNameMemberList();
     updateRolesToBeAssigned();
 
-    console.log(`Completed list creations\nunchangableNameMemberList: ${unchangableNameMemberList}` +
+    console.log(`unchangableNameMemberList: ${unchangableNameMemberList}` +
         `\nrolesToBeAssigned: ${rolesToBeAssigned}`);
 });
 
