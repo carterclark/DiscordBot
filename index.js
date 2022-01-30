@@ -24,6 +24,11 @@ client.once(`ready`, () => {
         `\nrolesToBeAssigned: ${rolesToBeAssigned}`);
 });
 
+client.on('roleCreate', role => {
+    updateRolesToBeAssigned();
+    console.log(`role [${role.name}] added to rolesToBeAssigned list`);
+})
+
 client.on('messageCreate', message => {
 
     if (message.channel.name === constants.authChannelName) {
@@ -210,7 +215,6 @@ function updateRolesToBeAssigned() {
 
     server.roles.cache.forEach(role => {
         if (!constants.topRoles.includes(role.name) &&
-            constants.everyoneRole != (role.name) &&
             !rolesToBeAssigned.includes(role.name)) {
             rolesToBeAssigned.push(role.name);
         }
