@@ -6,6 +6,7 @@ const constants = require("./constants.json");
 
 var rolesToBeAssigned = [];
 var unchangableNameMemberList = [];
+var roleAssignmentOn = true;
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
@@ -31,7 +32,7 @@ client.on('roleCreate', role => {
 
 client.on('messageCreate', message => {
 
-    if (message.channel.name === constants.authChannelName) {
+    if (message.channel.name === constants.authChannelName && roleAssignmentOn) {
 
         var splitMessage = message.content.split(',').join('').split(` `);
         if (splitMessage.at(0).startsWith('<@') && splitMessage.at(0).endsWith('>')) {
@@ -60,7 +61,7 @@ client.on('messageCreate', message => {
                             if (!alreadyHasRole(message.author.username, messageElement)) {
                                 let role = findRoleByName(messageElement);
                                 message.member.roles.add(role);
-                                rolesAdded += `, ${role}`;
+                                rolesAdded += `, ${role.name}`;
                             }
 
                         } else if (rolesToBeAssigned.includes(messageElement.toUpperCase())) {
@@ -68,7 +69,7 @@ client.on('messageCreate', message => {
                             if (!alreadyHasRole(message.author.username, messageElement.toUpperCase())) {
                                 let role = findRoleByName(messageElement.toUpperCase());
                                 message.member.roles.add(role);
-                                rolesAdded += `, ${role}`;
+                                rolesAdded += `, ${role.name}`;
                             }
 
                         }
@@ -115,6 +116,16 @@ client.on(`interactionCreate`, async interaction => {
     switch (commandName) {
         case `ping`:
             await interaction.reply(`Pong!`);
+            break;
+
+        case `assign_roles_on`:
+            roleAssignmentOn = true;
+            await interaction.reply(`Bot will assign roles`);
+            break;
+
+        case `assign_roles_off`:
+            roleAssignmentOn = false;
+            await interaction.reply(`Bot will not assign roles`);
             break;
 
         case `take_roles`: {

@@ -9,7 +9,9 @@ const commands = [
     new SlashCommandBuilder().setName('ping').setDescription('Replies with pong!'),
     new SlashCommandBuilder().setName('take_roles').setDescription('takes all class roles from everyone'),
     new SlashCommandBuilder().setName('info').setDescription('Replies with info for server, channel, and user'),
-    new SlashCommandBuilder().setName('list_roles').setDescription('Replies with a list of roles in the server')
+    new SlashCommandBuilder().setName('list_roles').setDescription('Replies with a list of roles in the server'),
+    new SlashCommandBuilder().setName('assign_roles_on').setDescription('Turns auto role assignemnt on'),
+    new SlashCommandBuilder().setName('assign_roles_off').setDescription('Turns auto role assignemnt off')
 ]
     .map(command => command.toJSON());
 
