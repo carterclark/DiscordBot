@@ -6,7 +6,7 @@ const constants = require("./constants.json");
 
 var rolesToBeAssigned = [];
 var unchangableNameMemberList = [];
-var roleAssignmentOn = true;
+var isRoleAssignmentOn = false;
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
@@ -32,7 +32,7 @@ client.on('roleCreate', role => {
 
 client.on('messageCreate', message => {
 
-    if (message.channel.name === constants.authChannelName && roleAssignmentOn) {
+    if (message.channel.name === constants.authChannelName && isRoleAssignmentOn) {
 
         var splitMessage = message.content.split(',').join('').split(` `);
         if (splitMessage.at(0).startsWith('<@') && splitMessage.at(0).endsWith('>')) {
@@ -119,12 +119,12 @@ client.on(`interactionCreate`, async interaction => {
             break;
 
         case `assign_roles_on`:
-            roleAssignmentOn = true;
+            isRoleAssignmentOn = true;
             await interaction.reply(`Bot will assign roles`);
             break;
 
         case `assign_roles_off`:
-            roleAssignmentOn = false;
+            isRoleAssignmentOn = false;
             await interaction.reply(`Bot will not assign roles`);
             break;
 
@@ -151,7 +151,11 @@ client.on(`interactionCreate`, async interaction => {
             await interaction.reply(
                 `Server name: ${interaction.guild.name}\nServer id: ${interaction.guild.id}\n` +
                 `Channel name: ${interaction.channel.name} \nChannel id: ${interaction.channel.id}\n` +
-                `\nYour tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}`);
+                `\nYour tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}` +
+                `unchangableNameMemberList: ${unchangableNameMemberList}`
+
+
+            );
             break;
         }
         case `list_roles`: {
