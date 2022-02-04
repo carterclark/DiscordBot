@@ -6,8 +6,7 @@
         "Moderator",
         "Bot Manager",
         "dev_bot",
-        "prod_bot",
-        "@everyone"
+        "prod_bot"
     ],
     "everyoneRole": "@everyone",
     "personRole": "Person",

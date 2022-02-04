@@ -151,7 +151,8 @@ client.on(`interactionCreate`, async interaction => {
             await interaction.reply(
                 `Server name: ${interaction.guild.name}\nServer id: ${interaction.guild.id}\n` +
                 `Channel name: ${interaction.channel.name} \nChannel id: ${interaction.channel.id}\n` +
-                `\nYour tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}` +
+                `Your tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}\n` +
+                `topRoles: ${constants.topRoles}\n` +
                 `unchangableNameMemberList: ${unchangableNameMemberList}`
 
 
@@ -218,6 +219,7 @@ function updateUnchangableNameMemberList() {
             roleName = server.roles.cache.get(roleId.at(0)).name;
 
             if (constants.topRoles.includes(roleName) && !unchangableNameMemberList.includes(member.displayName)) {
+                console.log(`adding ${member.displayName} to unchangableNameMemberList`);
                 unchangableNameMemberList.push(member.displayName);
                 continue;
             }
