@@ -232,7 +232,8 @@ function updateRolesToBeAssigned() {
 
     server.roles.cache.forEach(role => {
         if (!constants.topRoles.includes(role.name) &&
-            !rolesToBeAssigned.includes(role.name)) {
+            !rolesToBeAssigned.includes(role.name) &&
+            constants.everyoneRole !== role.name) {
             rolesToBeAssigned.push(role.name);
         }
     });
