@@ -118,6 +118,10 @@ client.on(`interactionCreate`, async interaction => {
             await interaction.reply(`Pong!`);
             break;
 
+        case `check_assign_roles`:
+            await interaction.reply(`isRoleAssignmentOn=${isRoleAssignmentOn}`);
+            break;
+
         case `assign_roles_on`:
             isRoleAssignmentOn = true;
             await interaction.reply(`Bot will assign roles`);
@@ -163,7 +167,9 @@ client.on(`interactionCreate`, async interaction => {
             let roleString = ``;
             interaction.guild.roles.cache.forEach(role => {
 
-                if (role.name != constants.everyoneRole) {
+                if (constants.everyoneRole !== role.name &&
+                    constants.personRole !== role.name &&
+                    !constants.topRoles.includes(role.name)) {
                     roleString += `\n` + role.name
                 }
             });
@@ -219,7 +225,6 @@ function updateUnchangableNameMemberList() {
             roleName = server.roles.cache.get(roleId.at(0)).name;
 
             if (constants.topRoles.includes(roleName) && !unchangableNameMemberList.includes(member.displayName)) {
-                console.log(`adding ${member.displayName} to unchangableNameMemberList`);
                 unchangableNameMemberList.push(member.displayName);
                 continue;
             }
