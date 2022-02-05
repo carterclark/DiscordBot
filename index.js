@@ -156,8 +156,8 @@ client.on(`interactionCreate`, async interaction => {
                 `Server name: ${interaction.guild.name}\nServer id: ${interaction.guild.id}\n` +
                 `Channel name: ${interaction.channel.name} \nChannel id: ${interaction.channel.id}\n` +
                 `Your tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}\n` +
-                `topRoles: ${constants.topRoles}\n` +
-                `unchangableNameMemberList: ${unchangableNameMemberList}`
+                `topRoles: [${constants.topRoles}]\n` +
+                `unchangableNameMemberList: [${unchangableNameMemberList}]`
 
 
             );
