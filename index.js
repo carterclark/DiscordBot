@@ -13,6 +13,14 @@ const client = new Client({
     Intents.FLAGS.GUILD_PRESENCES]
 });
 
+process.on('uncaughtException', (error) => {
+
+    const secretChannel = findChannelByName(constants.secretChannelName);
+    secretChannel.send(`Something broke, check the logs. \n{${error.name} : ${error.message}}`);
+    console.log(error.stack);
+
+});
+
 client.once(`ready`, () => {
     const server = client.guilds.cache.get(process.env.SERVER_ID);
 
@@ -40,54 +48,70 @@ client.on('messageCreate', message => {
             var roleId = splitMessage.at(0);
             roleId = roleId.slice(3, -1);
             const firstElement = message.guild.roles.cache.find(r => r.id === roleId).name;
-            splitMessage.shift(); // get rid of @moderator in array
+            splitMessage.shift(); // get rid of @ call in array
             splitMessage.push(constants.personRole); // so person role gets assigned
 
             if (firstElement == `Moderator`) {
                 updateUnchangableNameMemberList();
                 updateRolesToBeAssigned();
+
                 // to insure the first element is the persons name and not a class
                 if (!rolesToBeAssigned.includes(splitMessage.at(0))) {
 
                     var personName = ``;
-                    var rolesAdded = ``;
+                    var rolesAdded = [];
+                    var rolesSkipped = [];
                     var currentlyReadingName = true;
 
                     for (const messageElement of splitMessage) {
 
+                        // if the element matches a role name with case
                         if (rolesToBeAssigned.includes(messageElement)) {
                             currentlyReadingName = false;
+                            let role = findRoleByName(messageElement);
 
                             if (!alreadyHasRole(message.author.username, messageElement)) {
-                                let role = findRoleByName(messageElement);
                                 message.member.roles.add(role);
-                                rolesAdded += `, ${role.name}`;
+                                rolesAdded.push(role.name);
+                            } else {
+                                rolesSkipped.push(role.name);
                             }
 
+                            // if the element matches a role without case
                         } else if (rolesToBeAssigned.includes(messageElement.toUpperCase())) {
                             currentlyReadingName = false;
+                            let role = findRoleByName(messageElement.toUpperCase());
+
                             if (!alreadyHasRole(message.author.username, messageElement.toUpperCase())) {
-                                let role = findRoleByName(messageElement.toUpperCase());
                                 message.member.roles.add(role);
-                                rolesAdded += `, ${role.name}`;
+                                rolesAdded.push(role.name);
+                            } else {
+                                rolesSkipped.push(role.name);
                             }
 
                         }
 
+                        // if still reading name
                         else if (currentlyReadingName) {
                             personName += messageElement + ` `;
+                        }
+
+                        // element is after the name but not recongnized as a role
+                        else {
+                            rolesSkipped.push(messageElement);
                         }
                     }
 
                     personName = personName.slice(0, -1);
                     if (unchangableNameMemberList.includes(message.member.displayName)) {
-                        personName = `couldn't change nickname to [${personName}], role is above the bot`
+                        personName = `couldn't change nickname to "${personName}", role is above the bot`
                     } else {
                         message.member.setNickname("");
                         message.member.setNickname(personName);
                     }
                     message.reply(`name: ${message.member.displayName}` +
-                        `\nnickname: ${personName}\nroles added: ${rolesAdded.substring(1)}`);
+                        `\nnickname: "${personName}"\nroles added: [${rolesAdded}]` +
+                        `\nroles skipped: [${rolesSkipped}]`);
                 } else {
                     message.reply(`There was a problem reading your message. \nReminder, the format is ${constants.messageRoleFormat}`);
                 }
@@ -212,6 +236,14 @@ function findRoleByName(roleName) {
 
     return roleFound;
 
+}
+
+function findChannelByName(channelName) {
+
+    const server = client.guilds.cache.get(process.env.SERVER_ID);
+    let channelFound = server.channels.cache.find(channel => channel.name === channelName);
+
+    return channelFound;
 }
 
 function updateUnchangableNameMemberList() {
