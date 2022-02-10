@@ -6,7 +6,7 @@ const constants = require("./constants.json");
 
 var rolesToBeAssigned = [];
 var unchangableNameMemberList = [];
-var isRoleAssignmentOn = false;
+var isRoleAssignmentOn = true;
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
@@ -15,8 +15,8 @@ const client = new Client({
 
 process.on('uncaughtException', (error) => {
 
-    const secretChannel = findChannelByName(constants.botLogChannelName);
-    secretChannel.send(`Something broke, check the logs. \n{${error.name} : ${error.message}}`);
+    const logChannel = findChannelByName(constants.botLogChannelName);
+    logChannel.send(`Something broke, check the logs. \n{${error.name} : ${error.message}}`);
     console.log(error.stack);
 
 });
