@@ -12,5 +12,6 @@
     "personRole": "Person",
     "authChannelName": "authorization",
     "secretChannelName": "secret-secret",
+    "botLogChannelName": "bot-logs",
     "messageRoleFormat": "'@Moderator [YOUR NAME] [CLASS-1], [CLASS-2], ...'"
 }
