@@ -6,6 +6,7 @@ const constants = require("./constants.json");
 
 var rolesToBeAssigned = [];
 var unchangableNameMemberList = [];
+var classPrefixList = [];
 var isRoleAssignmentOn = true;
 
 const client = new Client({
@@ -53,10 +54,9 @@ client.on('messageCreate', message => {
 
             if (firstElement == `Moderator`) {
                 updateUnchangableNameMemberList();
-                updateRolesToBeAssigned();
 
                 // to insure the first element is the persons name and not a class
-                if (!rolesToBeAssigned.includes(splitMessage.at(0))) {
+                if (!rolesToBeAssigned.includes(splitMessage.at(0)) && !isTextWithClassPrefix(splitMessage.at(0))) {
 
                     var personName = ``;
                     var rolesAdded = [];
@@ -90,6 +90,10 @@ client.on('messageCreate', message => {
                             }
 
                         }
+                        else if (isTextWithClassPrefix(messageElement)) {
+                            currentlyReadingName = false;
+                            rolesSkipped.push(messageElement);
+                        }
 
                         // if still reading name
                         else if (currentlyReadingName) {
@@ -122,8 +126,6 @@ client.on('messageCreate', message => {
 });
 
 client.on(`interactionCreate`, async interaction => {
-    updateUnchangableNameMemberList();
-    updateRolesToBeAssigned();
 
     if (!interaction.isCommand()) return;
     else if (!unchangableNameMemberList.includes(interaction.member.displayName)) {
@@ -157,6 +159,8 @@ client.on(`interactionCreate`, async interaction => {
             break;
 
         case `take_roles`: {
+            updateUnchangableNameMemberList();
+            updateRolesToBeAssigned();
             var roleCount = 0;
 
             interaction.guild.members.cache.forEach(member => {
@@ -176,6 +180,7 @@ client.on(`interactionCreate`, async interaction => {
 
         case `info`: {
 
+            updateUnchangableNameMemberList();
             await interaction.reply(
                 `Server name: ${interaction.guild.name}\nServer id: ${interaction.guild.id}\n` +
                 `Channel name: ${interaction.channel.name} \nChannel id: ${interaction.channel.id}\n` +
@@ -272,6 +277,43 @@ function updateRolesToBeAssigned() {
             !rolesToBeAssigned.includes(role.name) &&
             constants.everyoneRole !== role.name) {
             rolesToBeAssigned.push(role.name);
+            addClassPrefixList(role.name);
         }
     });
+
+    console.log(`classPrefixList: ${classPrefixList}`)
+}
+
+function addClassPrefixList(roleName) {
+    let textArray = roleName.split("");
+    let prefix = "";
+
+    for (const text of textArray) {
+        if (text == "-" && !classPrefixList.includes(prefix)) {
+            classPrefixList.push(prefix);
+            break;
+        }
+
+        prefix += text;
+    }
+}
+
+function isTextWithClassPrefix(messageElement) {
+
+    let textArray = messageElement.split("");
+    let hasClassPrefix = false;
+    let prefix = "";
+
+    for (const text of textArray) {
+        if (text === "-" || text === " " || !isNaN(text)) {
+            break;
+        }
+        prefix += text.toUpperCase();
+    }
+
+    if (classPrefixList.includes(prefix)) {
+        hasClassPrefix = true;
+    }
+
+    return hasClassPrefix;
 }
