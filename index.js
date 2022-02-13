@@ -30,7 +30,7 @@ client.once(`ready`, () => {
     updateUnchangableNameMemberList();
     updateRolesToBeAssigned();
 
-    console.log(`unchangableNameMemberList: ${unchangableNameMemberList}` +
+    console.log(`unchangableNameMemberList: ${unchangableNameMemberList}\nclassPrefixList: ${classPrefixList}` +
         `\nrolesToBeAssigned: ${rolesToBeAssigned}`);
 });
 
@@ -280,8 +280,6 @@ function updateRolesToBeAssigned() {
             addClassPrefixList(role.name);
         }
     });
-
-    console.log(`classPrefixList: ${classPrefixList}`)
 }
 
 function addClassPrefixList(roleName) {
