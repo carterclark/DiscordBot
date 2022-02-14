@@ -52,7 +52,7 @@ client.on('messageCreate', message => {
             splitMessage.shift(); // get rid of @ call in array
             splitMessage.push(constants.personRole); // so person role gets assigned
 
-            if (firstElement == `Moderator`) {
+            if (firstElement == `Moderator`) { //is a moderator call
                 updateUnchangableNameMemberList();
 
                 // to insure the first element is the persons name and not a class
@@ -193,15 +193,7 @@ client.on(`interactionCreate`, async interaction => {
             break;
         }
         case `list_roles`: {
-            let roleString = ``;
-            interaction.guild.roles.cache.forEach(role => {
-
-                if (constants.everyoneRole !== role.name &&
-                    constants.personRole !== role.name &&
-                    !constants.topRoles.includes(role.name)) {
-                    roleString += `\n` + role.name
-                }
-            });
+            let roleString = sortRolesList(interaction.guild.roles.cache);
 
             await interaction.reply(`roles listed: ${roleString}`);
             break;
@@ -314,4 +306,41 @@ function isTextWithClassPrefix(messageElement) {
     }
 
     return hasClassPrefix;
+}
+
+function sortRolesList(rolesCache) {
+    let roleArray = [];
+    let roleString = ``;
+
+    rolesCache.forEach(role => {
+
+        if (constants.everyoneRole !== role.name &&
+            constants.personRole !== role.name &&
+            !constants.topRoles.includes(role.name)) {
+            roleArray.push(role.name);
+        }
+    });
+    insertionSort(roleArray);
+
+    for (const text of roleArray) {
+        roleString += `\n` + text;
+    }
+
+    return roleString;
+}
+
+function insertionSort(inputArr) {
+    let n = inputArr.length;
+    for (let i = 1; i < n; i++) {
+        // Choosing the first element in our unsorted subarray
+        let current = inputArr[i];
+        // The last element of our sorted subarray
+        let j = i - 1;
+        while ((j > -1) && (current.localeCompare(inputArr[j]) < 0)) {
+            inputArr[j + 1] = inputArr[j];
+            j--;
+        }
+        inputArr[j + 1] = current;
+    }
+    return inputArr;
 }
