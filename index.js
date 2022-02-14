@@ -193,7 +193,7 @@ client.on(`interactionCreate`, async interaction => {
             break;
         }
         case `list_roles`: {
-            let roleString = sortRolesList(interaction.guild.roles.cache);
+            let roleString = listOfRolesSortedAsString(interaction.guild.roles.cache);
 
             await interaction.reply(`roles listed: ${roleString}`);
             break;
@@ -308,7 +308,7 @@ function isTextWithClassPrefix(messageElement) {
     return hasClassPrefix;
 }
 
-function sortRolesList(rolesCache) {
+function listOfRolesSortedAsString(rolesCache) {
     let roleArray = [];
     let roleString = ``;
 
