@@ -1,8 +1,10 @@
-const dotenv = require('dotenv')
+const dotenv = require("dotenv");
 dotenv.config();
 
 const { Client, Intents } = require(`discord.js`);
-const constants = require("./constants.json");
+const constants = require("./utils/constants.json");
+const textParse = require(`./utils/textParse`);
+const discordActions = require(`./utils/discordActions`);
 
 var rolesToBeAssigned = [];
 var unchangableNameMemberList = [];
@@ -10,337 +12,270 @@ var classPrefixList = [];
 var isRoleAssignmentOn = true;
 
 const client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_PRESENCES]
+  intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MEMBERS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_PRESENCES,
+  ],
 });
 
-process.on('uncaughtException', (error) => {
-
-    const logChannel = findChannelByName(constants.botLogChannelName);
-    logChannel.send(`Something broke, check the logs. \n{${error.name} : ${error.message}}`);
-    console.log(error.stack);
-
+process.on("uncaughtException", (error) => {
+  const logChannel = discordActions.findChannelByName(
+    constants.botLogChannelName,
+    client
+  );
+  logChannel.send(
+    `Something broke, check the logs. \n{${error.name} : ${error.message}}`
+  );
+  console.log(error.stack);
 });
 
 client.once(`ready`, () => {
-    const server = client.guilds.cache.get(process.env.SERVER_ID);
+  const server = client.guilds.cache.get(process.env.SERVER_ID);
 
-    console.log(`DiscordBot initialized on server: ${server.name}`);
+  console.log(`DiscordBot initialized on server: ${server.name}`);
 
-    updateUnchangableNameMemberList();
-    updateRolesToBeAssigned();
+  discordActions.updateUnchangableNameMemberList(
+    client,
+    constants,
+    unchangableNameMemberList
+  );
+  discordActions.updateRolesToBeAssigned(
+    client,
+    constants,
+    rolesToBeAssigned,
+    classPrefixList
+  );
 
-    console.log(`unchangableNameMemberList: ${unchangableNameMemberList}\nclassPrefixList: ${classPrefixList}` +
-        `\nrolesToBeAssigned: ${rolesToBeAssigned}`);
+  console.log(
+    `unchangableNameMemberList: ${unchangableNameMemberList}\nclassPrefixList: ${classPrefixList}` +
+      `\nrolesToBeAssigned: ${rolesToBeAssigned}`
+  );
 });
 
-client.on('roleCreate', role => {
-    updateRolesToBeAssigned();
-    console.log(`role [${role.name}] added to rolesToBeAssigned list`);
-})
+client.on("roleCreate", (role) => {
+  discordActions.updateRolesToBeAssigned(
+    client,
+    constants,
+    rolesToBeAssigned,
+    classPrefixList
+  );
+  console.log(`role [${role.name}] added to rolesToBeAssigned list`);
+});
 
-client.on('messageCreate', message => {
+client.on("messageCreate", (message) => {
+  if (
+    message.channel.name === constants.authChannelName &&
+    isRoleAssignmentOn
+  ) {
+    var splitMessage = message.content.split(",").join("").split(` `);
+    if (
+      splitMessage.at(0).startsWith("<@") &&
+      splitMessage.at(0).endsWith(">")
+    ) {
+      var roleId = splitMessage.at(0);
+      roleId = roleId.slice(3, -1);
+      const firstElement = message.guild.roles.cache.find(
+        (r) => r.id === roleId
+      ).name;
+      splitMessage.shift(); // get rid of @ call in array
+      splitMessage.push(constants.personRole); // so person role gets assigned
 
-    if (message.channel.name === constants.authChannelName && isRoleAssignmentOn) {
+      if (firstElement == `Moderator`) {
+        //is a moderator call
+        discordActions.updateUnchangableNameMemberList(
+          client,
+          constants,
+          unchangableNameMemberList
+        );
 
-        var splitMessage = message.content.split(',').join('').split(` `);
-        if (splitMessage.at(0).startsWith('<@') && splitMessage.at(0).endsWith('>')) {
+        // to insure the first element is the persons name and not a class
+        if (
+          !rolesToBeAssigned.includes(splitMessage.at(0)) &&
+          !textParse.isTextWithClassPrefix(splitMessage.at(0), classPrefixList)
+        ) {
+          var personName = ``;
+          var rolesAdded = [];
+          var rolesSkipped = [];
+          var currentlyReadingName = true;
 
-            var roleId = splitMessage.at(0);
-            roleId = roleId.slice(3, -1);
-            const firstElement = message.guild.roles.cache.find(r => r.id === roleId).name;
-            splitMessage.shift(); // get rid of @ call in array
-            splitMessage.push(constants.personRole); // so person role gets assigned
+          for (const messageElement of splitMessage) {
+            // if the element matches a role name with case
+            // REMINDER: this is needed to read in the Person role
+            if (rolesToBeAssigned.includes(messageElement)) {
+              currentlyReadingName = false;
+              let role = discordActions.findRoleByName(messageElement, client);
 
-            if (firstElement == `Moderator`) { //is a moderator call
-                updateUnchangableNameMemberList();
+              if (
+                !discordActions.isRolePossessed(
+                  message.author.username,
+                  messageElement,
+                  client
+                )
+              ) {
+                message.member.roles.add(role);
+                rolesAdded.push(role.name);
+              } else {
+                rolesSkipped.push(role.name);
+              }
 
-                // to insure the first element is the persons name and not a class
-                if (!rolesToBeAssigned.includes(splitMessage.at(0)) && !isTextWithClassPrefix(splitMessage.at(0))) {
+              // if the element matches a role without case
+            } else if (
+              rolesToBeAssigned.includes(messageElement.toUpperCase())
+            ) {
+              currentlyReadingName = false;
+              let role = discordActions.findRoleByName(
+                messageElement.toUpperCase(),
+                client
+              );
 
-                    var personName = ``;
-                    var rolesAdded = [];
-                    var rolesSkipped = [];
-                    var currentlyReadingName = true;
-
-                    for (const messageElement of splitMessage) {
-
-                        // if the element matches a role name with case
-                        if (rolesToBeAssigned.includes(messageElement)) {
-                            currentlyReadingName = false;
-                            let role = findRoleByName(messageElement);
-
-                            if (!alreadyHasRole(message.author.username, messageElement)) {
-                                message.member.roles.add(role);
-                                rolesAdded.push(role.name);
-                            } else {
-                                rolesSkipped.push(role.name);
-                            }
-
-                            // if the element matches a role without case
-                        } else if (rolesToBeAssigned.includes(messageElement.toUpperCase())) {
-                            currentlyReadingName = false;
-                            let role = findRoleByName(messageElement.toUpperCase());
-
-                            if (!alreadyHasRole(message.author.username, messageElement.toUpperCase())) {
-                                message.member.roles.add(role);
-                                rolesAdded.push(role.name);
-                            } else {
-                                rolesSkipped.push(role.name);
-                            }
-
-                        }
-                        else if (isTextWithClassPrefix(messageElement)) {
-                            currentlyReadingName = false;
-                            rolesSkipped.push(messageElement);
-                        }
-
-                        // if still reading name
-                        else if (currentlyReadingName) {
-                            personName += messageElement + ` `;
-                        }
-
-                        // element is after the name but not recongnized as a role
-                        else {
-                            rolesSkipped.push(messageElement);
-                        }
-                    }
-
-                    personName = personName.slice(0, -1);
-                    if (unchangableNameMemberList.includes(message.member.displayName)) {
-                        personName = `couldn't change nickname to "${personName}", role is above the bot`
-                    } else {
-                        message.member.setNickname("");
-                        message.member.setNickname(personName);
-                    }
-                    message.reply(`name: ${message.member.displayName}` +
-                        `\nnickname: "${personName}"\nroles added: [${rolesAdded}]` +
-                        `\nroles skipped: [${rolesSkipped}]`);
-                } else {
-                    message.reply(`There was a problem reading your message. \nReminder, the format is ${constants.messageRoleFormat}`);
-                }
+              if (
+                !discordActions.isRolePossessed(
+                  message.author.username,
+                  messageElement.toUpperCase(),
+                  client
+                )
+              ) {
+                message.member.roles.add(role);
+                rolesAdded.push(role.name);
+              } else {
+                rolesSkipped.push(role.name);
+              }
+            } else if (
+              textParse.isTextWithClassPrefix(messageElement, classPrefixList)
+            ) {
+              currentlyReadingName = false;
+              rolesSkipped.push(messageElement);
             }
-        }
-    }
 
+            // if still reading name
+            else if (currentlyReadingName) {
+              personName += messageElement + ` `;
+            }
+
+            // element is after the name but not recongnized as a role
+            else {
+              rolesSkipped.push(messageElement);
+            }
+          }
+
+          personName = personName.slice(0, -1);
+          if (unchangableNameMemberList.includes(message.member.displayName)) {
+            personName = `couldn't change nickname to "${personName}", role is above the bot`;
+          } else {
+            message.member.setNickname("");
+            message.member.setNickname(personName);
+          }
+          message.reply(
+            `name: ${message.member.displayName}` +
+              `\nnickname: "${personName}"\nroles added: [${rolesAdded}]` +
+              `\nroles skipped: [${rolesSkipped}]`
+          );
+        } else {
+          message.reply(
+            `There was a problem reading your message. \nReminder, the format is ${constants.messageRoleFormat}`
+          );
+        }
+      }
+    }
+  }
 });
 
-client.on(`interactionCreate`, async interaction => {
+client.on(`interactionCreate`, async (interaction) => {
+  if (!interaction.isCommand()) return;
+  else if (
+    !unchangableNameMemberList.includes(interaction.member.displayName)
+  ) {
+    await interaction.reply("Commands for me are only enabled for mods");
+    return;
+  } else if (interaction.channel.name != constants.secretChannelName) {
+    await interaction.reply(
+      "Commands for me are not enabled outside the mod chat"
+    );
+    return;
+  }
 
-    if (!interaction.isCommand()) return;
-    else if (!unchangableNameMemberList.includes(interaction.member.displayName)) {
-        await interaction.reply("Commands for me are only enabled for mods");
-        return;
+  const { commandName } = interaction;
+
+  switch (commandName) {
+    case `ping`:
+      await interaction.reply(`Pong!`);
+      break;
+
+    case `check_assign_roles`:
+      await interaction.reply(`isRoleAssignmentOn=${isRoleAssignmentOn}`);
+      break;
+
+    case `assign_roles_on`:
+      isRoleAssignmentOn = true;
+      await interaction.reply(`Bot will assign roles`);
+      break;
+
+    case `assign_roles_off`:
+      isRoleAssignmentOn = false;
+      await interaction.reply(`Bot will not assign roles`);
+      break;
+
+    case `take_roles`: {
+      discordActions.updateUnchangableNameMemberList(
+        client,
+        constants,
+        unchangableNameMemberList
+      );
+      discordActions.updateRolesToBeAssigned(
+        client,
+        constants,
+        rolesToBeAssigned,
+        classPrefixList
+      );
+      var roleCount = 0;
+
+      interaction.guild.members.cache.forEach((member) => {
+        member.roles.cache.forEach((role) => {
+          if (
+            rolesToBeAssigned.includes(role.name) &&
+            role.name != constants.personRole
+          ) {
+            roleCount++;
+            member.roles.remove(role);
+            console.log(`removing ${role.name} from ${member.displayName}`);
+          }
+        });
+      });
+
+      await interaction.reply(
+        `take_roles removed ${roleCount} roles from server ` +
+          `${interaction.guild.name}`
+      );
+      break;
     }
-    else if (interaction.channel.name != constants.secretChannelName) {
-        await interaction.reply("Commands for me are not enabled outside the mod chat");
-        return;
+
+    case `info`: {
+      discordActions.updateUnchangableNameMemberList(
+        client,
+        constants,
+        unchangableNameMemberList
+      );
+      await interaction.reply(
+        `Server name: ${interaction.guild.name}\nServer id: ${interaction.guild.id}\n` +
+          `Channel name: ${interaction.channel.name} \nChannel id: ${interaction.channel.id}\n` +
+          `Your tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}\n` +
+          `topRoles: [${constants.topRoles}]\n` +
+          `unchangableNameMemberList: [${unchangableNameMemberList}]`
+      );
+      break;
     }
+    case `list_roles`: {
+      let roleString = discordActions.fetchListOfRolesSorted(
+        interaction.guild.roles.cache,
+        constants
+      );
 
-    const { commandName } = interaction;
-
-    switch (commandName) {
-        case `ping`:
-            await interaction.reply(`Pong!`);
-            break;
-
-        case `check_assign_roles`:
-            await interaction.reply(`isRoleAssignmentOn=${isRoleAssignmentOn}`);
-            break;
-
-        case `assign_roles_on`:
-            isRoleAssignmentOn = true;
-            await interaction.reply(`Bot will assign roles`);
-            break;
-
-        case `assign_roles_off`:
-            isRoleAssignmentOn = false;
-            await interaction.reply(`Bot will not assign roles`);
-            break;
-
-        case `take_roles`: {
-            updateUnchangableNameMemberList();
-            updateRolesToBeAssigned();
-            var roleCount = 0;
-
-            interaction.guild.members.cache.forEach(member => {
-                member.roles.cache.forEach(role => {
-                    if (rolesToBeAssigned.includes(role.name) && role.name != constants.personRole) {
-                        roleCount++;
-                        member.roles.remove(role);
-                        console.log(`removing ${role.name} from ${member.displayName}`);
-                    }
-                })
-            });
-
-            await interaction.reply(`take_roles removed ${roleCount} roles from server ` +
-                `${interaction.guild.name}`);
-            break;
-        }
-
-        case `info`: {
-
-            updateUnchangableNameMemberList();
-            await interaction.reply(
-                `Server name: ${interaction.guild.name}\nServer id: ${interaction.guild.id}\n` +
-                `Channel name: ${interaction.channel.name} \nChannel id: ${interaction.channel.id}\n` +
-                `Your tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}\n` +
-                `topRoles: [${constants.topRoles}]\n` +
-                `unchangableNameMemberList: [${unchangableNameMemberList}]`
-
-
-            );
-            break;
-        }
-        case `list_roles`: {
-            let roleString = listOfRolesSortedAsString(interaction.guild.roles.cache);
-
-            await interaction.reply(`roles listed: ${roleString}`);
-            break;
-        }
+      await interaction.reply(`roles listed: ${roleString}`);
+      break;
     }
+  }
 });
 
 client.login(process.env.BOT_AUTH_TOKEN);
-
-//functions for convenience
-
-function alreadyHasRole(username, roleName) {
-
-    const server = client.guilds.cache.get(process.env.SERVER_ID);
-    var hasRole = false;
-
-    server.members.cache.forEach(member => {
-
-        if (member.user.username === username) {
-
-            member.roles.cache.forEach(role => {
-                if (role.name === roleName) {
-                    hasRole = true;
-                }
-            });
-        }
-
-    });
-
-
-    return hasRole;
-}
-
-function findRoleByName(roleName) {
-    const server = client.guilds.cache.get(process.env.SERVER_ID);
-    let roleFound = server.roles.cache.find(role => role.name === roleName);
-
-    return roleFound;
-
-}
-
-function findChannelByName(channelName) {
-
-    const server = client.guilds.cache.get(process.env.SERVER_ID);
-    let channelFound = server.channels.cache.find(channel => channel.name === channelName);
-
-    return channelFound;
-}
-
-function updateUnchangableNameMemberList() {
-
-    const server = client.guilds.cache.get(process.env.SERVER_ID);
-    var roleName = ``;
-
-    server.members.cache.forEach(member => {
-        for (const roleId of member.roles.cache) {
-
-            roleName = server.roles.cache.get(roleId.at(0)).name;
-
-            if (constants.topRoles.includes(roleName) && !unchangableNameMemberList.includes(member.displayName)) {
-                unchangableNameMemberList.push(member.displayName);
-                continue;
-            }
-        }
-    });
-}
-
-function updateRolesToBeAssigned() {
-    const server = client.guilds.cache.get(process.env.SERVER_ID);
-
-    server.roles.cache.forEach(role => {
-        if (!constants.topRoles.includes(role.name) &&
-            !rolesToBeAssigned.includes(role.name) &&
-            constants.everyoneRole !== role.name) {
-            rolesToBeAssigned.push(role.name);
-            addClassPrefixList(role.name);
-        }
-    });
-}
-
-function addClassPrefixList(roleName) {
-    let textArray = roleName.split("");
-    let prefix = "";
-
-    for (const text of textArray) {
-        if (text == "-" && !classPrefixList.includes(prefix)) {
-            classPrefixList.push(prefix);
-            break;
-        }
-
-        prefix += text;
-    }
-}
-
-function isTextWithClassPrefix(messageElement) {
-
-    let textArray = messageElement.split("");
-    let hasClassPrefix = false;
-    let prefix = "";
-
-    for (const text of textArray) {
-        if (text === "-" || text === " " || !isNaN(text)) {
-            break;
-        }
-        prefix += text.toUpperCase();
-    }
-
-    if (classPrefixList.includes(prefix)) {
-        hasClassPrefix = true;
-    }
-
-    return hasClassPrefix;
-}
-
-function listOfRolesSortedAsString(rolesCache) {
-    let roleArray = [];
-    let roleString = ``;
-
-    rolesCache.forEach(role => {
-
-        if (constants.everyoneRole !== role.name &&
-            constants.personRole !== role.name &&
-            !constants.topRoles.includes(role.name)) {
-            roleArray.push(role.name);
-        }
-    });
-    insertionSort(roleArray);
-
-    for (const text of roleArray) {
-        roleString += `\n` + text;
-    }
-
-    return roleString;
-}
-
-function insertionSort(inputArr) {
-    let n = inputArr.length;
-    for (let i = 1; i < n; i++) {
-        // Choosing the first element in our unsorted subarray
-        let current = inputArr[i];
-        // The last element of our sorted subarray
-        let j = i - 1;
-        while ((j > -1) && (current.localeCompare(inputArr[j]) < 0)) {
-            inputArr[j + 1] = inputArr[j];
-            j--;
-        }
-        inputArr[j + 1] = current;
-    }
-    return inputArr;
-}
