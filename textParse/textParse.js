@@ -1,4 +1,4 @@
-function isTextWithClassPrefix(messageElement, classPrefixList) {
+function hasClassPrefix(messageElement, classPrefixList) {
   let textArray = messageElement.split("");
   let hasClassPrefix = false;
   let prefix = "";
@@ -33,4 +33,4 @@ function insertionSort(inputArr) {
   return [inputArr];
 }
 
-module.exports = { insertionSort, isTextWithClassPrefix };
+module.exports = { insertionSort, hasClassPrefix };

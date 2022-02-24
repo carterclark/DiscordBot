@@ -1,4 +1,4 @@
-const textParse = require(`./textParse`);
+const textParse = require(`../textParse/textParse`);
 
 function isRolePossessed(username, roleName, client) {
   const server = client.guilds.cache.get(process.env.SERVER_ID);
@@ -26,6 +26,7 @@ function findRoleByName(roleName, client) {
 
 function findChannelByName(channelName, client) {
   const server = client.guilds.cache.get(process.env.SERVER_ID);
+  console.log(`server: ${server}`);
   let channelFound = server.channels.cache.find(
     (channel) => channel.name === channelName
   );
