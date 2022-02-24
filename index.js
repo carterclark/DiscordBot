@@ -2,14 +2,16 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const { Client, Intents } = require(`discord.js`);
-const constants = require("./utils/constants.json");
-const textParse = require(`./utils/textParse`);
-const discordActions = require(`./utils/discordActions`);
+const constants = require("./constants/constants.json");
+const textParse = require(`./textParse/textParse`);
+const discordActions = require(`./commands/discordActions`);
 
 var rolesToBeAssigned = [];
 var unchangableNameMemberList = [];
 var classPrefixList = [];
 var isRoleAssignmentOn = true;
+var totalTime = 0;
+var callCounter = 0;
 
 const client = new Client({
   intents: [
@@ -32,10 +34,6 @@ process.on("uncaughtException", (error) => {
 });
 
 client.once(`ready`, () => {
-  const server = client.guilds.cache.get(process.env.SERVER_ID);
-
-  console.log(`DiscordBot initialized on server: ${server.name}`);
-
   discordActions.updateUnchangableNameMemberList(
     client,
     constants,
@@ -48,9 +46,10 @@ client.once(`ready`, () => {
     classPrefixList
   );
 
+  const server = client.guilds.cache.get(process.env.SERVER_ID);
   console.log(
-    `unchangableNameMemberList: ${unchangableNameMemberList}\nclassPrefixList: ${classPrefixList}` +
-      `\nrolesToBeAssigned: ${rolesToBeAssigned}`
+    `DiscordBot initialized on server: ${server.name}\nunchangableNameMemberList: [${unchangableNameMemberList}]\nclassPrefixList: [${classPrefixList}]` +
+      `\nrolesToBeAssigned: [${rolesToBeAssigned}]`
   );
 });
 
@@ -83,6 +82,9 @@ client.on("messageCreate", (message) => {
       splitMessage.push(constants.personRole); // so person role gets assigned
 
       if (firstElement == `Moderator`) {
+        let startTime = Date.now();
+        console.log(`Role call initiated for ${message.author.username}`);
+
         //is a moderator call
         discordActions.updateUnchangableNameMemberList(
           client,
@@ -93,7 +95,7 @@ client.on("messageCreate", (message) => {
         // to insure the first element is the persons name and not a class
         if (
           !rolesToBeAssigned.includes(splitMessage.at(0)) &&
-          !textParse.isTextWithClassPrefix(splitMessage.at(0), classPrefixList)
+          !textParse.hasClassPrefix(splitMessage.at(0), classPrefixList)
         ) {
           var personName = ``;
           var rolesAdded = [];
@@ -143,7 +145,7 @@ client.on("messageCreate", (message) => {
                 rolesSkipped.push(role.name);
               }
             } else if (
-              textParse.isTextWithClassPrefix(messageElement, classPrefixList)
+              textParse.hasClassPrefix(messageElement, classPrefixList)
             ) {
               currentlyReadingName = false;
               rolesSkipped.push(messageElement);
@@ -168,7 +170,7 @@ client.on("messageCreate", (message) => {
             message.member.setNickname(personName);
           }
           message.reply(
-            `name: ${message.member.displayName}` +
+            `username: ${message.author.username}` +
               `\nnickname: "${personName}"\nroles added: [${rolesAdded}]` +
               `\nroles skipped: [${rolesSkipped}]`
           );
@@ -177,6 +179,7 @@ client.on("messageCreate", (message) => {
             `There was a problem reading your message. \nReminder, the format is ${constants.messageRoleFormat}`
           );
         }
+        logTime(startTime);
       }
     }
   }
@@ -279,3 +282,13 @@ client.on(`interactionCreate`, async (interaction) => {
 });
 
 client.login(process.env.BOT_AUTH_TOKEN);
+
+function logTime(startTime) {
+  let endTime = Date.now() - startTime;
+  totalTime += endTime;
+  console.log(
+    `Rolling complete after: ${endTime} seconds\tAverage: ${
+      totalTime / ++callCounter
+    } seconds`
+  );
+}
