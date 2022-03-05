@@ -4,12 +4,14 @@ dotenv.config();
 const { Client, Intents } = require(`discord.js`);
 const constants = require("./constants/constants.json");
 const textParse = require(`./textParse/textParse`);
-const discordActions = require(`./commands/discordActions`);
+const discordActions = require(`./actions/discordActions`);
+const logHelper = require(`./util/logHelper`);
 
 var rolesToBeAssigned = [];
 var unchangableNameMemberList = [];
 var classPrefixList = [];
 var isRoleAssignmentOn = true;
+var isTakeRolesOn = false;
 var totalTime = 0;
 var callCounter = 0;
 
@@ -179,7 +181,7 @@ client.on("messageCreate", (message) => {
             `There was a problem reading your message. \nReminder, the format is ${constants.messageRoleFormat}`
           );
         }
-        logTime(startTime);
+        logHelper.logTime(startTime, totalTime, callCounter);
       }
     }
   }
@@ -210,47 +212,66 @@ client.on(`interactionCreate`, async (interaction) => {
       await interaction.reply(`isRoleAssignmentOn=${isRoleAssignmentOn}`);
       break;
 
-    case `assign_roles_on`:
+    case `enable_assign_roles`:
       isRoleAssignmentOn = true;
       await interaction.reply(`Bot will assign roles`);
       break;
 
-    case `assign_roles_off`:
+    case `disable_assign_roles`:
       isRoleAssignmentOn = false;
-      await interaction.reply(`Bot will not assign roles`);
+      await interaction.reply(`Bot will NOT assign roles`);
+      break;
+
+    case `check_take_roles`:
+      await interaction.reply(`isTakeRolesOn=${isTakeRolesOn}`);
+      break;
+
+    case `enable_take_roles`:
+      isTakeRolesOn = true;
+      await interaction.reply(`Bot will take roles`);
+      break;
+
+    case `disable_take_roles`:
+      isTakeRolesOn = false;
+      await interaction.reply(`Bot will NOT take roles`);
       break;
 
     case `take_roles`: {
-      discordActions.updateUnchangableNameMemberList(
-        client,
-        constants,
-        unchangableNameMemberList
-      );
-      discordActions.updateRolesToBeAssigned(
-        client,
-        constants,
-        rolesToBeAssigned,
-        classPrefixList
-      );
-      var roleCount = 0;
+      if (isTakeRolesOn) {
+        discordActions.updateUnchangableNameMemberList(
+          client,
+          constants,
+          unchangableNameMemberList
+        );
+        discordActions.updateRolesToBeAssigned(
+          client,
+          constants,
+          rolesToBeAssigned,
+          classPrefixList
+        );
+        var roleCount = 0;
 
-      interaction.guild.members.cache.forEach((member) => {
-        member.roles.cache.forEach((role) => {
-          if (
-            rolesToBeAssigned.includes(role.name) &&
-            role.name != constants.personRole
-          ) {
-            roleCount++;
-            member.roles.remove(role);
-            console.log(`removing ${role.name} from ${member.displayName}`);
-          }
+        interaction.guild.members.cache.forEach((member) => {
+          member.roles.cache.forEach((role) => {
+            if (
+              rolesToBeAssigned.includes(role.name) &&
+              role.name != constants.personRole
+            ) {
+              roleCount++;
+              member.roles.remove(role);
+              console.log(`removing ${role.name} from ${member.displayName}`);
+            }
+          });
         });
-      });
 
-      await interaction.reply(
-        `take_roles removed ${roleCount} roles from server ` +
-          `${interaction.guild.name}`
-      );
+        await interaction.reply(
+          `take_roles removed ${roleCount} roles from server ` +
+            `${interaction.guild.name}`
+        );
+      } else {
+        await interaction.reply(`take_roles is currently disabled`);
+      }
+
       break;
     }
 
@@ -270,7 +291,7 @@ client.on(`interactionCreate`, async (interaction) => {
       break;
     }
     case `list_roles`: {
-      let roleString = discordActions.fetchListOfRolesSorted(
+      const roleString = discordActions.fetchListOfRolesSorted(
         interaction.guild.roles.cache,
         constants
       );
@@ -282,13 +303,3 @@ client.on(`interactionCreate`, async (interaction) => {
 });
 
 client.login(process.env.BOT_AUTH_TOKEN);
-
-function logTime(startTime) {
-  let endTime = Date.now() - startTime;
-  totalTime += endTime;
-  console.log(
-    `Rolling complete after: ${endTime} seconds\tAverage: ${
-      totalTime / ++callCounter
-    } seconds`
-  );
-}
