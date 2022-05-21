@@ -4,6 +4,11 @@ dotenv.config();
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
+const secretHelper = require("./util/secretHelper");
+
+let botAuthToken;
+let clientId;
+let serverId;
 
 const commands = [
   new SlashCommandBuilder()
@@ -38,15 +43,23 @@ const commands = [
     .setDescription("Checks if take_roles command is enabled"),
 ].map((command) => command.toJSON());
 
-const rest = new REST({ version: "9" }).setToken(process.env.BOT_AUTH_TOKEN);
+if (process.env.GOOGLE_CLOUD_SHELL === undefined) {
+  // is NOT running in google cloud
+  botAuthToken = process.env.BOT_AUTH_TOKEN;
+  clientId = process.env.CLIENT_ID;
+  serverId = process.env.SERVER_ID;
+} else {
+  // is running in google cloud
+  botAuthToken = secretHelper.accessSecretVersion("BOT_AUTH_TOKEN");
+  clientId = secretHelper.accessSecretVersion("CLIENT_ID");
+  serverId = secretHelper.accessSecretVersion("SERVER_ID");
+}
+
+const rest = new REST({ version: "9" }).setToken(botAuthToken);
 
 rest
-  .put(
-    Routes.applicationGuildCommands(
-      process.env.CLIENT_ID,
-      process.env.SERVER_ID
-    ),
-    { body: commands }
-  )
+  .put(Routes.applicationGuildCommands(clientId, serverId), {
+    body: commands,
+  })
   .then(() => console.log("Successfully registered application commands."))
   .catch(console.error);
