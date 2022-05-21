@@ -72,12 +72,12 @@ function updateRolesToBeAssigned(
       constants.everyoneRole !== role.name
     ) {
       rolesToBeAssigned.push(role.name);
-      addClassPrefixList(role.name, classPrefixList);
+      addToClassPrefixList(role.name, classPrefixList);
     }
   });
 }
 
-function addClassPrefixList(roleName, classPrefixList) {
+function addToClassPrefixList(roleName, classPrefixList) {
   let textArray = roleName.split("");
   let prefix = "";
 
