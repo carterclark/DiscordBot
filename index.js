@@ -1,3 +1,11 @@
+var express = require("express");
+
+var app = express();
+
+var mainServer = app.listen(process.env.PORT || "8080", function () {
+  console.log("on server: %s", mainServer.address().port);
+});
+
 const dotenv = require("dotenv");
 dotenv.config();
 
