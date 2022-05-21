@@ -24,16 +24,6 @@
 7. Copy URL, paste it in a new tab, press enter
 8. Complete forms and add to server
 
-### Terminal Commands
-
-- Start app: `node index.js`
-- Deploy new commands for bot: `node deploy-commands.js`
-- Run tests: `npm run test`
-
-- Start app: `node index.js`
-- Deploy new commands for bot: `node deploy-commands.js`
-- Run tests: `npm run test`
-
 ## Workflow
 
 ### github
@@ -46,6 +36,12 @@
 
 - [node.js](https://nodejs.org/en/docs/)
 - [discord.js](https://discord.js.org/#/docs/main/stable/general/welcome)
+
+## Commands
+
+- Start app: `node index.js`
+- Deploy new commands for bot: `node deploy-commands.js`
+- Run tests: `npm run test`
 
 ### Links
 
