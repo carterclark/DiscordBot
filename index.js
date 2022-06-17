@@ -6,6 +6,7 @@ const constants = require("./constants/constants.json");
 const textParse = require(`./textParse/textParse`);
 const discordActions = require(`./actions/discordActions`);
 const logHelper = require(`./util/logHelper`);
+const commandsHandler = require(`./commands/commandsHandler`);
 
 var rolesToBeAssigned = [];
 var unchangableNameMemberList = [];
@@ -25,6 +26,7 @@ const client = new Client({
 });
 
 process.on("uncaughtException", (error) => {
+  console.log(error.stack);
   const logChannel = discordActions.findChannelByName(
     constants.botLogChannelName,
     client
@@ -32,7 +34,6 @@ process.on("uncaughtException", (error) => {
   logChannel.send(
     `Something broke, check the logs. \n{${error.name} : ${error.message}}`
   );
-  console.log(error.stack);
 });
 
 client.once(`ready`, () => {
@@ -49,10 +50,17 @@ client.once(`ready`, () => {
   );
 
   const server = client.guilds.cache.get(process.env.SERVER_ID);
-  console.log(
-    `DiscordBot initialized on server: ${server.name}\nunchangableNameMemberList: [${unchangableNameMemberList}]\nclassPrefixList: [${classPrefixList}]` +
-      `\nrolesToBeAssigned: [${rolesToBeAssigned}]`
+
+  const logChannel = discordActions.findChannelByName(
+    constants.botLogChannelName,
+    client
   );
+
+  const logString =
+    `DiscordBot initialized on server: ${server.name}\nunchangableNameMemberList: [${unchangableNameMemberList}]\nclassPrefixList: [${classPrefixList}]` +
+    `\nrolesToBeAssigned: [${rolesToBeAssigned}]`;
+  console.log(logString);
+  logChannel.send(logString);
 });
 
 client.on("roleCreate", (role) => {
@@ -68,8 +76,14 @@ client.on("roleCreate", (role) => {
 client.on("messageCreate", (message) => {
   if (
     message.channel.name === constants.authChannelName &&
-    isRoleAssignmentOn
+    isRoleAssignmentOn &&
+    !message.author.bot
   ) {
+    console.log(
+      `\nmessage.mentions.users: ${JSON.stringify(
+        message.mentions.roles.name
+      )}\n`
+    );
     var splitMessage = message.content.split(",").join("").split(` `);
     if (
       splitMessage.at(0).startsWith("<@") &&
@@ -188,117 +202,21 @@ client.on("messageCreate", (message) => {
 });
 
 client.on(`interactionCreate`, async (interaction) => {
+  await interaction.reply(`interaction content: ${interaction}`);
+
   if (!interaction.isCommand()) return;
-  else if (
-    !unchangableNameMemberList.includes(interaction.member.displayName)
-  ) {
-    await interaction.reply("Commands for me are only enabled for mods");
-    return;
-  } else if (interaction.channel.name != constants.secretChannelName) {
-    await interaction.reply(
-      "Commands for me are not enabled outside the mod chat"
+  else {
+    commandsHandler.handleCommands(
+      interaction,
+      unchangableNameMemberList,
+      isRoleAssignmentOn,
+      isTakeRolesOn,
+      discordActions,
+      client,
+      rolesToBeAssigned,
+      classPrefixList,
+      constants
     );
-    return;
-  }
-
-  const { commandName } = interaction;
-
-  switch (commandName) {
-    case `ping`:
-      await interaction.reply(`Pong!`);
-      break;
-
-    case `check_assign_roles`:
-      await interaction.reply(`isRoleAssignmentOn=${isRoleAssignmentOn}`);
-      break;
-
-    case `enable_assign_roles`:
-      isRoleAssignmentOn = true;
-      await interaction.reply(`Bot will assign roles`);
-      break;
-
-    case `disable_assign_roles`:
-      isRoleAssignmentOn = false;
-      await interaction.reply(`Bot will NOT assign roles`);
-      break;
-
-    case `check_take_roles`:
-      await interaction.reply(`isTakeRolesOn=${isTakeRolesOn}`);
-      break;
-
-    case `enable_take_roles`:
-      isTakeRolesOn = true;
-      await interaction.reply(`Bot will take roles`);
-      break;
-
-    case `disable_take_roles`:
-      isTakeRolesOn = false;
-      await interaction.reply(`Bot will NOT take roles`);
-      break;
-
-    case `take_roles`: {
-      if (isTakeRolesOn) {
-        discordActions.updateUnchangableNameMemberList(
-          client,
-          constants,
-          unchangableNameMemberList
-        );
-        discordActions.updateRolesToBeAssigned(
-          client,
-          constants,
-          rolesToBeAssigned,
-          classPrefixList
-        );
-        var roleCount = 0;
-
-        interaction.guild.members.cache.forEach((member) => {
-          member.roles.cache.forEach((role) => {
-            if (
-              rolesToBeAssigned.includes(role.name) &&
-              role.name != constants.personRole
-            ) {
-              roleCount++;
-              member.roles.remove(role);
-              console.log(`removing ${role.name} from ${member.displayName}`);
-            }
-          });
-        });
-
-        await interaction.reply(
-          `take_roles removed ${roleCount} roles from server ` +
-            `${interaction.guild.name}`
-        );
-      } else {
-        await interaction.reply(`take_roles is currently disabled`);
-      }
-
-      break;
-    }
-
-    case `info`: {
-      discordActions.updateUnchangableNameMemberList(
-        client,
-        constants,
-        unchangableNameMemberList
-      );
-      await interaction.reply(
-        `Server name: ${interaction.guild.name}\nServer id: ${interaction.guild.id}\n` +
-          `Channel name: ${interaction.channel.name} \nChannel id: ${interaction.channel.id}\n` +
-          `Your tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}\n` +
-          `topRoles: [${constants.topRoles}]\n` +
-          `unchangableNameMemberList: [${unchangableNameMemberList}]`
-      );
-      break;
-    }
-    case `list_roles`: {
-      const roleString = discordActions.fetchListOfRolesSorted(
-        interaction.guild.roles.cache,
-        constants
-      );
-
-      await interaction.reply(`roles listed: ${roleString}`);
-      break;
-    }
   }
 });
 

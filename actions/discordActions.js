@@ -26,7 +26,11 @@ function findRoleByName(roleName, client) {
 
 function findChannelByName(channelName, client) {
   const server = client.guilds.cache.get(process.env.SERVER_ID);
-  console.log(`server: ${server}`);
+  console.log(
+    `client: ${JSON.stringify(
+      client
+    )}\nserver: ${server}\nprocess.env.SERVER_ID: ${process.env.SERVER_ID}`
+  );
   let channelFound = server.channels.cache.find(
     (channel) => channel.name === channelName
   );
