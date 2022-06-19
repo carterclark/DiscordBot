@@ -1,10 +1,11 @@
-function hasClassPrefix(messageElement, classPrefixList) {
+function hasClassPrefix(messageElement: string, classPrefixList: string[]) {
   let textArray = messageElement.split("");
   let hasClassPrefix = false;
   let prefix = "";
 
   for (const text of textArray) {
-    if (text === "-" || text === " " || !isNaN(text)) {
+    console.log(`!isNaN(Number(text)): ${!isNaN(Number(text))}`);
+    if (text === "-" || text === " " || !isNaN(Number(text))) {
       break;
     }
     prefix += text.toUpperCase();
@@ -17,7 +18,7 @@ function hasClassPrefix(messageElement, classPrefixList) {
   return hasClassPrefix;
 }
 
-function insertionSort(inputArr) {
+function insertionSort(inputArr: any[]) {
   let n = inputArr.length;
   for (let i = 1; i < n; i++) {
     // Choosing the first element in our unsorted subarray
