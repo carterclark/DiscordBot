@@ -4,7 +4,6 @@ function hasClassPrefix(messageElement: string, classPrefixList: string[]) {
   let prefix = "";
 
   for (const text of textArray) {
-    console.log(`!isNaN(Number(text)): ${!isNaN(Number(text))}`);
     if (text === "-" || text === " " || !isNaN(Number(text))) {
       break;
     }

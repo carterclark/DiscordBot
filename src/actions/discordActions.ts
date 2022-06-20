@@ -1,4 +1,5 @@
 import {
+  Channel,
   Client,
   Collection,
   Guild,
@@ -48,15 +49,20 @@ export function findChannelByName(channelName: String, client: Client) {
   return channelFound!;
 }
 
+export function findChannelById(channelId: string, client: Client) {
+  let server: Guild = client.guilds.cache.get(String(process.env.SERVER_ID))!;
+
+  const channelFound = server.channels.cache.get(channelId);
+
+  return channelFound;
+}
+
 export function updateUnchangableNameMemberList(
   client: Client,
   unchangableNameMemberList: string[]
 ) {
-  const sampleArray: string[] = ["yes"];
-
   const server = client.guilds.cache.get(String(process.env.SERVER_ID));
   var roleName = ``;
-
   server!.members.cache.forEach((member) => {
     for (const roleId of member.roles.cache) {
       roleName = server!.roles.cache.get(String(roleId.at(0)))!.name;
