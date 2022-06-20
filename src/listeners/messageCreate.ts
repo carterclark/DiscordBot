@@ -1,4 +1,5 @@
-import { Client, Message } from "discord.js";
+import { Channel, Client, Message, TextBasedChannel } from "discord.js";
+import { findChannelById } from "../actions/discordActions";
 
 const constants = require("../constants/constants.json");
 const discordActions = require(`../actions/discordActions`);
@@ -12,10 +13,10 @@ export default (
   classPrefixList: string[]
 ): void => {
   client.on("messageCreate", (message: Message) => {
-    if (
-      message.channel.isText.name === constants.authChannelName &&
-      isRoleAssignmentOn
-    ) {
+    const channel = findChannelById(message.channelId, client)!;
+
+    // console.log(`message.mentions: ${message.mentions.roles.}`); later stuff to test Carter
+    if (channel.name === constants.authChannelName && isRoleAssignmentOn) {
       var splitMessage: string[] = message.content
         .split(",")
         .join("")
@@ -39,7 +40,6 @@ export default (
           //is a moderator call
           discordActions.updateUnchangableNameMemberList(
             client,
-            constants,
             unchangableNameMemberList
           );
 
