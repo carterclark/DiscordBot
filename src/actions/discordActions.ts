@@ -69,9 +69,9 @@ export function updateUnchangableNameMemberList(
 
       if (
         constants.topRoles.includes(roleName) &&
-        !unchangableNameMemberList.includes(member.displayName)
+        !unchangableNameMemberList.includes(member.user.username)
       ) {
-        unchangableNameMemberList.push(member.displayName);
+        unchangableNameMemberList.push(member.user.username);
         continue;
       }
     }

@@ -118,7 +118,7 @@ export default (
 
             personName = personName.slice(0, -1);
             if (
-              unchangableNameMemberList.includes(message.member!.displayName)
+              unchangableNameMemberList.includes(message.member!.user.username)
             ) {
               personName = `couldn't change nickname to "${personName}", role is above the bot`;
             } else {
