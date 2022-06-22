@@ -1,33 +1,33 @@
-import { Client, Collection, CommandInteraction, Role } from "discord.js";
-import { insertionSort } from "../textParse/textParse";
-
 const constants = require("../constants/constants.json");
+const textParse = require(`../textParse/textParse`);
 
-export async function takeRoles(
-  interaction: CommandInteraction,
-  rolesToBeAssigned: string[]
-) {
+export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
   let roleTakenCount = 0;
   let userWithRoleTakenCount = 0;
   let userNotCounted: boolean;
 
-  interaction.guild!.members.cache.forEach((member) => {
-    userNotCounted = true;
-    member.roles.cache.forEach((role) => {
-      if (
-        rolesToBeAssigned.includes(role.name) &&
-        role.name != constants.personRole
-      ) {
-        roleTakenCount++;
-        member.roles.remove(role);
-        console.log(`removing ${role.name} from ${member.displayName}`);
-        if (userNotCounted) {
-          userWithRoleTakenCount++;
-          userNotCounted = false;
+  interaction.guild!.members.cache.forEach(
+    (member: {
+      roles: { cache: any[]; remove: (arg0: any) => void };
+      displayName: any;
+    }) => {
+      userNotCounted = true;
+      member.roles.cache.forEach((role: { name: string }) => {
+        if (
+          rolesToBeAssigned.includes(role.name) &&
+          role.name != constants.personRole
+        ) {
+          roleTakenCount++;
+          member.roles.remove(role);
+          console.log(`removing ${role.name} from ${member.displayName}`);
+          if (userNotCounted) {
+            userWithRoleTakenCount++;
+            userNotCounted = false;
+          }
         }
-      }
-    });
-  });
+      });
+    }
+  );
 
   await interaction.reply(
     `take_roles removed ${roleTakenCount} roles from ${userWithRoleTakenCount} users` +
@@ -38,39 +38,43 @@ export async function takeRoles(
 export function isRolePossessed(
   username: String,
   roleName: String,
-  client: Client
+  client: any
 ) {
   const server = client.guilds.cache.get(String(process.env.SERVER_ID));
   let hasRole = false;
 
-  server!.members.cache.forEach((member) => {
-    if (member.user.username === username) {
-      member.roles.cache.forEach((role) => {
-        if (role.name === roleName) {
-          hasRole = true;
-        }
-      });
+  server!.members.cache.forEach(
+    (member: { user: { username: String }; roles: { cache: any[] } }) => {
+      if (member.user.username === username) {
+        member.roles.cache.forEach((role: { name: String }) => {
+          if (role.name === roleName) {
+            hasRole = true;
+          }
+        });
+      }
     }
-  });
+  );
 
   return hasRole;
 }
 
-export function findRoleByName(roleName: String, client: Client) {
+export function findRoleByName(roleName: String, client: any) {
   const server = client.guilds.cache.get(String(process.env.SERVER_ID));
-  let roleFound = server!.roles.cache.find((role) => role.name === roleName);
+  let roleFound = server!.roles.cache.find(
+    (role: { name: String }) => role.name === roleName
+  );
 
   return roleFound;
 }
 
 export function updateRolesToBeAssigned(
-  client: Client,
+  client: any,
   rolesToBeAssigned: String[],
   classPrefixList: String[]
 ) {
   const server = client.guilds.cache.get(String(process.env.SERVER_ID));
 
-  server!.roles.cache.forEach((role) => {
+  server!.roles.cache.forEach((role: { name: String }) => {
     if (
       !constants.topRoles.includes(role.name) &&
       !rolesToBeAssigned.includes(role.name) &&
@@ -82,11 +86,11 @@ export function updateRolesToBeAssigned(
   });
 }
 
-export function fetchListOfRolesSorted(rolesCache: Collection<string, Role>) {
+export function fetchListOfRolesSorted(rolesCache: any) {
   let roleArray: String[] = [];
   let roleString: String = ``;
 
-  rolesCache.forEach((role: Role) => {
+  rolesCache.forEach((role: any) => {
     if (
       constants.everyoneRole !== role.name &&
       constants.personRole !== role.name &&
@@ -95,7 +99,7 @@ export function fetchListOfRolesSorted(rolesCache: Collection<string, Role>) {
       roleArray.push(role.name);
     }
   });
-  insertionSort(roleArray);
+  textParse.insertionSort(roleArray);
 
   for (const text of roleArray) {
     roleString += `\n` + text;

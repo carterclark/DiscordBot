@@ -1,4 +1,3 @@
-const dotenv = require("dotenv");
 dotenv.config();
 
 const { SlashCommandBuilder } = require("@discordjs/builders");

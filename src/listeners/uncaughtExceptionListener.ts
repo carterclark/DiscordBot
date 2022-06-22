@@ -1,13 +1,10 @@
-import { Client, TextChannel } from "discord.js";
-
-//used to sidestep problems with typescript imports
-const constants = require("../constants/constants.json");
 const channelActions = require(`../actions/channelActions`);
+const constants = require("../constants/constants.json");
 
-export default (process: NodeJS.Process, client: Client): void => {
+export function uncaughtException(process: NodeJS.Process, client: any): void {
   process.on("uncaughtException", (error) => {
     console.log(error.stack);
-    const logChannel: TextChannel = channelActions.findChannelByName(
+    const logChannel = channelActions.findChannelByName(
       constants.botLogChannelName,
       client
     );
@@ -15,4 +12,6 @@ export default (process: NodeJS.Process, client: Client): void => {
       `Something broke, check the logs. \n{${error.name} : ${error.message}}`
     );
   });
-};
+}
+
+module.exports = { uncaughtException };

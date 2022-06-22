@@ -1,20 +1,18 @@
-import { Client, Message } from "discord.js";
-import { updateUnchangableNameMemberList } from "../actions/userActions";
-import { findChannelById } from "../actions/channelActions";
-import { findRoleByName, isRolePossessed } from "../actions/roleActions";
-import { hasClassPrefix } from "../textParse/textParse";
-
 const constants = require("../constants/constants.json");
+const channelActions = require(`../actions/channelActions`);
+const roleActions = require(`../actions/roleActions`);
+const userActions = require(`../actions/userActions`);
+const textParse = require(`../textParse/textParse`);
 
-export default (
-  client: Client,
+export function messageCreate(
+  client: any,
   isRoleAssignmentOn: boolean,
   unchangableNameMemberList: string[],
   rolesToBeAssigned: string[],
   classPrefixList: string[]
-): void => {
-  client.on("messageCreate", (message: Message) => {
-    const channel = findChannelById(message.channelId, client)!;
+): void {
+  client.on("messageCreate", (message: any) => {
+    const channel = channelActions.findChannelById(message.channelId, client)!;
 
     // console.log(`message.mentions: ${message.mentions.roles.}`); later stuff to test Carter
     if (channel.name === constants.authChannelName && isRoleAssignmentOn) {
@@ -29,7 +27,7 @@ export default (
         let roleId: String = splitMessage.at(0)!;
         roleId = roleId.slice(3, -1);
         const firstElement = message.guild!.roles.cache.find(
-          (r) => r.id === roleId!
+          (role: { id: String }) => role.id === roleId!
         )!.name;
         splitMessage.shift(); // get rid of @ call in array
         splitMessage.push(constants.personRole); // so person role gets assigned
@@ -38,13 +36,16 @@ export default (
           let startTime = Date.now();
           console.log(`Role call initiated for ${message.author.username}`);
 
-          //is a moderator call
-          updateUnchangableNameMemberList(client, unchangableNameMemberList);
+          //check is a moderator call
+          userActions.updateUnchangableNameMemberList(
+            client,
+            unchangableNameMemberList
+          );
 
           // to insure the first element is the persons name and not a class
           if (
             !rolesToBeAssigned.includes(splitMessage.at(0)!) &&
-            !hasClassPrefix(splitMessage.at(0)!, classPrefixList)
+            !textParse.hasClassPrefix(splitMessage.at(0)!, classPrefixList)
           ) {
             let personName = ``;
             let rolesAdded: any[] = [];
@@ -56,10 +57,10 @@ export default (
               // REMINDER: this is needed to read in the Person role
               if (rolesToBeAssigned.includes(messageElement)) {
                 currentlyReadingName = false;
-                let role = findRoleByName(messageElement, client)!;
+                let role = roleActions.findRoleByName(messageElement, client)!;
 
                 if (
-                  !isRolePossessed(
+                  !roleActions.isRolePossessed(
                     message.author.username,
                     messageElement,
                     client
@@ -76,13 +77,13 @@ export default (
                 rolesToBeAssigned.includes(messageElement.toUpperCase())
               ) {
                 currentlyReadingName = false;
-                let role = findRoleByName(
+                let role = roleActions.findRoleByName(
                   messageElement.toUpperCase(),
                   client
                 )!;
 
                 if (
-                  !isRolePossessed(
+                  !roleActions.isRolePossessed(
                     message.author.username,
                     messageElement.toUpperCase(),
                     client
@@ -93,7 +94,9 @@ export default (
                 } else {
                   rolesSkipped.push(role.name);
                 }
-              } else if (hasClassPrefix(messageElement, classPrefixList)) {
+              } else if (
+                textParse.hasClassPrefix(messageElement, classPrefixList)
+              ) {
                 currentlyReadingName = false;
                 rolesSkipped.push(messageElement);
               }
@@ -132,4 +135,6 @@ export default (
       }
     }
   });
-};
+}
+
+module.exports = { messageCreate };

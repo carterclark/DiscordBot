@@ -1,25 +1,30 @@
-import { Client, TextChannel } from "discord.js";
-import * as dotenv from "dotenv";
-import { updateRolesToBeAssigned } from "../actions/roleActions";
-import { updateUnchangableNameMemberList } from "../actions/userActions";
+const constants = require("../constants/constants.json");
+const channelActions = require(`../actions/channelActions`);
+const roleActions = require(`../actions/roleActions`);
+const userActions = require(`../actions/userActions`);
+const dotenv = require("dotenv");
 dotenv.config();
 
-const channelActions = require(`../actions/channelActions`);
-const constants = require("../constants/constants.json");
-
-export default (
-  client: Client,
+export function ready(
+  client: any,
   unchangableNameMemberList: string[],
   rolesToBeAssigned: string[],
   classPrefixList: string[]
-): void => {
+): void {
   client.on("ready", async () => {
     if (!client.user || !client.application) {
       return;
     }
 
-    updateUnchangableNameMemberList(client, unchangableNameMemberList);
-    updateRolesToBeAssigned(client, rolesToBeAssigned, classPrefixList);
+    userActions.updateUnchangableNameMemberList(
+      client,
+      unchangableNameMemberList
+    );
+    roleActions.updateRolesToBeAssigned(
+      client,
+      rolesToBeAssigned,
+      classPrefixList
+    );
 
     const server = client.guilds.cache.get(String(process.env.SERVER_ID));
     const logString: string =
@@ -29,10 +34,12 @@ export default (
       `\nrolesToBeAssigned: [${rolesToBeAssigned}]`;
 
     console.log(logString);
-    const logChannel: TextChannel = channelActions.findChannelByName(
+    const logChannel: any = channelActions.findChannelByName(
       constants.botLogChannelName,
       client
     );
     logChannel.send(logString);
   });
-};
+}
+
+module.exports = { ready };

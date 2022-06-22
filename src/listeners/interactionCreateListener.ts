@@ -1,23 +1,17 @@
-import { Client, Interaction } from "discord.js";
-import { updateUnchangableNameMemberList } from "../actions/userActions";
-import { findChannelById } from "../actions/channelActions";
-import {
-  fetchListOfRolesSorted,
-  takeRoles,
-  updateRolesToBeAssigned,
-} from "../actions/roleActions";
-
 const constants = require("../constants/constants.json");
+const channelActions = require(`../actions/channelActions`);
+const roleActions = require(`../actions/roleActions`);
+const userActions = require(`../actions/userActions`);
 
-export default (
-  client: Client,
+export function interactionCreate(
+  client: any,
   unchangableNameMemberList: string[],
   isRoleAssignmentOn: boolean,
   isTakeRolesOn: boolean,
   rolesToBeAssigned: string[],
   classPrefixList: string[]
-): void => {
-  client.on(`interactionCreate`, async (interaction: Interaction) => {
+): void {
+  client.on(`interactionCreate`, async (interaction: any) => {
     if (!interaction.isCommand() || interaction === null) return;
     else if (
       !unchangableNameMemberList.includes(interaction.member!.user.username)
@@ -25,7 +19,7 @@ export default (
       await interaction.reply("Commands for me are only enabled for mods");
       return;
     } else if (
-      findChannelById(interaction.channelId, client)?.name !=
+      channelActions.findChannelById(interaction.channelId, client)?.name !=
       constants.secretChannelName
     ) {
       await interaction.reply(
@@ -71,9 +65,16 @@ export default (
 
       case `take_roles`: {
         if (isTakeRolesOn) {
-          updateUnchangableNameMemberList(client, unchangableNameMemberList);
-          updateRolesToBeAssigned(client, rolesToBeAssigned, classPrefixList);
-          takeRoles(interaction, rolesToBeAssigned);
+          userActions.updateUnchangableNameMemberList(
+            client,
+            unchangableNameMemberList
+          );
+          roleActions.updateRolesToBeAssigned(
+            client,
+            rolesToBeAssigned,
+            classPrefixList
+          );
+          roleActions.takeRoles(interaction, rolesToBeAssigned);
         } else {
           await interaction.reply(`take_roles is currently disabled`);
         }
@@ -82,7 +83,10 @@ export default (
       }
 
       case `info`: {
-        updateUnchangableNameMemberList(client, unchangableNameMemberList);
+        userActions.updateUnchangableNameMemberList(
+          client,
+          unchangableNameMemberList
+        );
         await interaction.reply(
           `Server name: ${interaction!.guild!.name}\nServer id: ${
             interaction!.guild!.id
@@ -97,7 +101,7 @@ export default (
         break;
       }
       case `list_roles`: {
-        const roleString = fetchListOfRolesSorted(
+        const roleString = roleActions.fetchListOfRolesSorted(
           interaction!.guild!.roles.cache
         );
 
@@ -106,4 +110,6 @@ export default (
       }
     }
   });
-};
+}
+
+module.exports = { interactionCreate };
