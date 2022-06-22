@@ -1,4 +1,3 @@
-import { TextChannel } from "discord.js";
 import ready from "./listeners/ready";
 import * as dotenv from "dotenv";
 import messageCreate from "./listeners/messageCreate";
@@ -8,8 +7,6 @@ import uncaughtException from "./listeners/uncaughtException";
 dotenv.config();
 
 const { Client, Intents } = require(`discord.js`);
-const constants = require("./constants/constants.json");
-const discordActions = require(`./actions/discordActions`);
 
 var rolesToBeAssigned: string[] = [];
 let unchangableNameMemberList: string[] = [];

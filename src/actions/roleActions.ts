@@ -1,14 +1,6 @@
-import {
-  Channel,
-  Client,
-  Collection,
-  Guild,
-  GuildBasedChannel,
-  Role,
-  TextChannel,
-} from "discord.js";
+import { Client, Collection, Role } from "discord.js";
+import { insertionSort } from "../textParse/textParse";
 
-const textParse = require(`../textParse/textParse`);
 const constants = require("../constants/constants.json");
 
 export function isRolePossessed(
@@ -39,45 +31,6 @@ export function findRoleByName(roleName: String, client: Client) {
   return roleFound;
 }
 
-export function findChannelByName(channelName: String, client: Client) {
-  let server: Guild = client.guilds.cache.get(String(process.env.SERVER_ID))!;
-
-  let channelFound = server!.channels.cache.find(
-    (channel) => channel.name === channelName
-  );
-
-  return channelFound!;
-}
-
-export function findChannelById(channelId: string, client: Client) {
-  let server: Guild = client.guilds.cache.get(String(process.env.SERVER_ID))!;
-
-  const channelFound = server.channels.cache.get(channelId);
-
-  return channelFound;
-}
-
-export function updateUnchangableNameMemberList(
-  client: Client,
-  unchangableNameMemberList: string[]
-) {
-  const server = client.guilds.cache.get(String(process.env.SERVER_ID));
-  var roleName = ``;
-  server!.members.cache.forEach((member) => {
-    for (const roleId of member.roles.cache) {
-      roleName = server!.roles.cache.get(String(roleId.at(0)))!.name;
-
-      if (
-        constants.topRoles.includes(roleName) &&
-        !unchangableNameMemberList.includes(member.user.username)
-      ) {
-        unchangableNameMemberList.push(member.user.username);
-        continue;
-      }
-    }
-  });
-}
-
 export function updateRolesToBeAssigned(
   client: Client,
   rolesToBeAssigned: String[],
@@ -97,6 +50,28 @@ export function updateRolesToBeAssigned(
   });
 }
 
+export function fetchListOfRolesSorted(rolesCache: Collection<string, Role>) {
+  let roleArray: String[] = [];
+  let roleString: String = ``;
+
+  rolesCache.forEach((role: Role) => {
+    if (
+      constants.everyoneRole !== role.name &&
+      constants.personRole !== role.name &&
+      !constants.topRoles.includes(role.name)
+    ) {
+      roleArray.push(role.name);
+    }
+  });
+  insertionSort(roleArray);
+
+  for (const text of roleArray) {
+    roleString += `\n` + text;
+  }
+
+  return roleString;
+}
+
 export function addToClassPrefixList(
   roleName: String,
   classPrefixList: String[]
@@ -112,26 +87,4 @@ export function addToClassPrefixList(
 
     prefix += text;
   }
-}
-
-export function fetchListOfRolesSorted(rolesCache: Collection<string, Role>) {
-  let roleArray: String[] = [];
-  let roleString: String = ``;
-
-  rolesCache.forEach((role: Role) => {
-    if (
-      constants.everyoneRole !== role.name &&
-      constants.personRole !== role.name &&
-      !constants.topRoles.includes(role.name)
-    ) {
-      roleArray.push(role.name);
-    }
-  });
-  textParse.insertionSort(roleArray);
-
-  for (const text of roleArray) {
-    roleString += `\n` + text;
-  }
-
-  return roleString;
 }

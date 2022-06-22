@@ -1,5 +1,5 @@
 import { Client, Role } from "discord.js";
-import { updateRolesToBeAssigned } from "../actions/discordActions";
+import { updateRolesToBeAssigned } from "../actions/roleActions";
 
 export default (
   client: Client,

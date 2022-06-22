@@ -1,8 +1,12 @@
 import { Client, Interaction } from "discord.js";
-import { findChannelById } from "../actions/discordActions";
+import { updateUnchangableNameMemberList } from "../actions/userActions";
+import { findChannelById } from "../actions/channelActions";
+import {
+  fetchListOfRolesSorted,
+  updateRolesToBeAssigned,
+} from "../actions/roleActions";
 
 const constants = require("../constants/constants.json");
-const discordActions = require(`../actions/discordActions`);
 
 export default (
   client: Client,
@@ -66,15 +70,8 @@ export default (
 
       case `take_roles`: {
         if (isTakeRolesOn) {
-          discordActions.updateUnchangableNameMemberList(
-            client,
-            unchangableNameMemberList
-          );
-          discordActions.updateRolesToBeAssigned(
-            client,
-            rolesToBeAssigned,
-            classPrefixList
-          );
+          updateUnchangableNameMemberList(client, unchangableNameMemberList);
+          updateRolesToBeAssigned(client, rolesToBeAssigned, classPrefixList);
           var roleCount = 0;
 
           interaction.guild!.members.cache.forEach((member) => {
@@ -102,11 +99,7 @@ export default (
       }
 
       case `info`: {
-        discordActions.updateUnchangableNameMemberList(
-          client,
-          constants,
-          unchangableNameMemberList
-        );
+        updateUnchangableNameMemberList(client, unchangableNameMemberList);
         await interaction.reply(
           `Server name: ${interaction!.guild!.name}\nServer id: ${
             interaction!.guild!.id
@@ -121,9 +114,8 @@ export default (
         break;
       }
       case `list_roles`: {
-        const roleString = discordActions.fetchListOfRolesSorted(
-          interaction!.guild!.roles.cache,
-          constants
+        const roleString = fetchListOfRolesSorted(
+          interaction!.guild!.roles.cache
         );
 
         await interaction.reply(`roles listed: ${roleString}`);

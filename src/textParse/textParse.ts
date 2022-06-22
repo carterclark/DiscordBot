@@ -1,4 +1,7 @@
-function hasClassPrefix(messageElement: string, classPrefixList: string[]) {
+export function hasClassPrefix(
+  messageElement: string,
+  classPrefixList: string[]
+) {
   let textArray = messageElement.split("");
   let hasClassPrefix = false;
   let prefix = "";
@@ -17,7 +20,7 @@ function hasClassPrefix(messageElement: string, classPrefixList: string[]) {
   return hasClassPrefix;
 }
 
-function insertionSort(inputArr: any[]) {
+export function insertionSort(inputArr: any[]) {
   let n = inputArr.length;
   for (let i = 1; i < n; i++) {
     // Choosing the first element in our unsorted subarray
@@ -32,5 +35,3 @@ function insertionSort(inputArr: any[]) {
   }
   return [inputArr];
 }
-
-module.exports = { insertionSort, hasClassPrefix };

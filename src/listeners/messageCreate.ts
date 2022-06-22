@@ -1,9 +1,10 @@
-import { Channel, Client, Message, TextBasedChannel } from "discord.js";
-import { findChannelById } from "../actions/discordActions";
+import { Client, Message } from "discord.js";
+import { updateUnchangableNameMemberList } from "../actions/userActions";
+import { findChannelById } from "../actions/channelActions";
+import { findRoleByName, isRolePossessed } from "../actions/roleActions";
+import { hasClassPrefix } from "../textParse/textParse";
 
 const constants = require("../constants/constants.json");
-const discordActions = require(`../actions/discordActions`);
-const textParse = require(`../textParse/textParse`);
 
 export default (
   client: Client,
@@ -38,15 +39,12 @@ export default (
           console.log(`Role call initiated for ${message.author.username}`);
 
           //is a moderator call
-          discordActions.updateUnchangableNameMemberList(
-            client,
-            unchangableNameMemberList
-          );
+          updateUnchangableNameMemberList(client, unchangableNameMemberList);
 
           // to insure the first element is the persons name and not a class
           if (
             !rolesToBeAssigned.includes(splitMessage.at(0)!) &&
-            !textParse.hasClassPrefix(splitMessage.at(0), classPrefixList)
+            !hasClassPrefix(splitMessage.at(0)!, classPrefixList)
           ) {
             var personName = ``;
             var rolesAdded: any[] = [];
@@ -58,13 +56,10 @@ export default (
               // REMINDER: this is needed to read in the Person role
               if (rolesToBeAssigned.includes(messageElement)) {
                 currentlyReadingName = false;
-                let role = discordActions.findRoleByName(
-                  messageElement,
-                  client
-                );
+                let role = findRoleByName(messageElement, client)!;
 
                 if (
-                  !discordActions.isRolePossessed(
+                  !isRolePossessed(
                     message.author.username,
                     messageElement,
                     client
@@ -81,13 +76,13 @@ export default (
                 rolesToBeAssigned.includes(messageElement.toUpperCase())
               ) {
                 currentlyReadingName = false;
-                let role = discordActions.findRoleByName(
+                let role = findRoleByName(
                   messageElement.toUpperCase(),
                   client
-                );
+                )!;
 
                 if (
-                  !discordActions.isRolePossessed(
+                  !isRolePossessed(
                     message.author.username,
                     messageElement.toUpperCase(),
                     client
@@ -98,9 +93,7 @@ export default (
                 } else {
                   rolesSkipped.push(role.name);
                 }
-              } else if (
-                textParse.hasClassPrefix(messageElement, classPrefixList)
-              ) {
+              } else if (hasClassPrefix(messageElement, classPrefixList)) {
                 currentlyReadingName = false;
                 rolesSkipped.push(messageElement);
               }
