@@ -7,7 +7,7 @@ export function updateUnchangableNameMemberList(
   unchangableNameMemberList: string[]
 ) {
   const server = client.guilds.cache.get(String(process.env.SERVER_ID));
-  var roleName = ``;
+  let roleName = ``;
   server!.members.cache.forEach((member) => {
     for (const roleId of member.roles.cache) {
       roleName = server!.roles.cache.get(String(roleId.at(0)))!.name;

@@ -3,6 +3,7 @@ import { updateUnchangableNameMemberList } from "../actions/userActions";
 import { findChannelById } from "../actions/channelActions";
 import {
   fetchListOfRolesSorted,
+  takeRoles,
   updateRolesToBeAssigned,
 } from "../actions/roleActions";
 
@@ -72,25 +73,7 @@ export default (
         if (isTakeRolesOn) {
           updateUnchangableNameMemberList(client, unchangableNameMemberList);
           updateRolesToBeAssigned(client, rolesToBeAssigned, classPrefixList);
-          var roleCount = 0;
-
-          interaction.guild!.members.cache.forEach((member) => {
-            member.roles.cache.forEach((role) => {
-              if (
-                rolesToBeAssigned.includes(role.name) &&
-                role.name != constants.personRole
-              ) {
-                roleCount++;
-                member.roles.remove(role);
-                console.log(`removing ${role.name} from ${member.displayName}`);
-              }
-            });
-          });
-
-          await interaction.reply(
-            `take_roles removed ${roleCount} roles from server ` +
-              `${interaction!.guild!.name}`
-          );
+          takeRoles(interaction, rolesToBeAssigned);
         } else {
           await interaction.reply(`take_roles is currently disabled`);
         }

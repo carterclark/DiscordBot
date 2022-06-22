@@ -18,7 +18,7 @@ export default (
 
     // console.log(`message.mentions: ${message.mentions.roles.}`); later stuff to test Carter
     if (channel.name === constants.authChannelName && isRoleAssignmentOn) {
-      var splitMessage: string[] = message.content
+      let splitMessage: string[] = message.content
         .split(",")
         .join("")
         .split(` `);
@@ -26,7 +26,7 @@ export default (
         splitMessage.at(0)!.startsWith("<@") &&
         splitMessage.at(0)!.endsWith(">")
       ) {
-        var roleId: String = splitMessage.at(0)!;
+        let roleId: String = splitMessage.at(0)!;
         roleId = roleId.slice(3, -1);
         const firstElement = message.guild!.roles.cache.find(
           (r) => r.id === roleId!
@@ -46,10 +46,10 @@ export default (
             !rolesToBeAssigned.includes(splitMessage.at(0)!) &&
             !hasClassPrefix(splitMessage.at(0)!, classPrefixList)
           ) {
-            var personName = ``;
-            var rolesAdded: any[] = [];
-            var rolesSkipped: any[] = [];
-            var currentlyReadingName = true;
+            let personName = ``;
+            let rolesAdded: any[] = [];
+            let rolesSkipped: any[] = [];
+            let currentlyReadingName = true;
 
             for (const messageElement of splitMessage) {
               // if the element matches a role name with case

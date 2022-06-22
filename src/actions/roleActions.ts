@@ -1,7 +1,39 @@
-import { Client, Collection, Role } from "discord.js";
+import { Client, Collection, CommandInteraction, Role } from "discord.js";
 import { insertionSort } from "../textParse/textParse";
 
 const constants = require("../constants/constants.json");
+
+export async function takeRoles(
+  interaction: CommandInteraction,
+  rolesToBeAssigned: string[]
+) {
+  let roleTakenCount = 0;
+  let userWithRoleTakenCount = 0;
+  let userNotCounted: boolean;
+
+  interaction.guild!.members.cache.forEach((member) => {
+    userNotCounted = true;
+    member.roles.cache.forEach((role) => {
+      if (
+        rolesToBeAssigned.includes(role.name) &&
+        role.name != constants.personRole
+      ) {
+        roleTakenCount++;
+        member.roles.remove(role);
+        console.log(`removing ${role.name} from ${member.displayName}`);
+        if (userNotCounted) {
+          userWithRoleTakenCount++;
+          userNotCounted = false;
+        }
+      }
+    });
+  });
+
+  await interaction.reply(
+    `take_roles removed ${roleTakenCount} roles from ${userWithRoleTakenCount} users` +
+      ` in ${interaction!.guild!.name}`
+  );
+}
 
 export function isRolePossessed(
   username: String,
@@ -9,7 +41,7 @@ export function isRolePossessed(
   client: Client
 ) {
   const server = client.guilds.cache.get(String(process.env.SERVER_ID));
-  var hasRole = false;
+  let hasRole = false;
 
   server!.members.cache.forEach((member) => {
     if (member.user.username === username) {

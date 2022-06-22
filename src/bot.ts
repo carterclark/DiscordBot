@@ -8,11 +8,11 @@ dotenv.config();
 
 const { Client, Intents } = require(`discord.js`);
 
-var rolesToBeAssigned: string[] = [];
+let rolesToBeAssigned: string[] = [];
 let unchangableNameMemberList: string[] = [];
-var classPrefixList: string[] = [];
-var isRoleAssignmentOn = true;
-var isTakeRolesOn = false;
+let classPrefixList: string[] = [];
+let isRoleAssignmentOn = true;
+let isTakeRolesOn = false;
 
 const client = new Client({
   intents: [
