@@ -1,3 +1,4 @@
+const dotenv = require("dotenv");
 dotenv.config();
 
 const { SlashCommandBuilder } = require("@discordjs/builders");
@@ -6,7 +7,7 @@ const { Routes } = require("discord-api-types/v9");
 
 const commands = [
   new SlashCommandBuilder()
-    .setName("testing")
+    .setName("ping")
     .setDescription("Replies with pong!"),
   new SlashCommandBuilder()
     .setName("take_roles")
@@ -17,6 +18,12 @@ const commands = [
   new SlashCommandBuilder()
     .setName("list_roles")
     .setDescription("Replies with a list of roles in the server"),
+  new SlashCommandBuilder()
+    .setName("enable_assign_roles")
+    .setDescription("Turns auto role assignemnt on"),
+  new SlashCommandBuilder()
+    .setName("disable_assign_roles")
+    .setDescription("Turns auto role assignemnt off"),
   new SlashCommandBuilder()
     .setName("check_assign_roles")
     .setDescription("Checks if role assignment is enabled"),

@@ -6,10 +6,10 @@
     "npm": "8.x"
   },
   "description": "second discord bot program",
-  "main": "bot.js",
+  "main": "index.js",
   "scripts": {
-    "start": "ts-node src/bot.ts",
-    "commands": "ts-node src/deploy-commands.ts"
+    "start": "node index.js",
+    "test": "jest"
   },
   "author": "Carter Clark",
   "license": "ISC",
@@ -17,12 +17,11 @@
     "@discordjs/builders": "^0.11.0",
     "@discordjs/rest": "^0.2.0-canary.0",
     "discord-api-types": "^0.26.1",
-    "discord.js": "^13.8.0",
-    "dotenv": "^12.0.4",
-    "ts-node": "^10.8.1"
+    "discord.js": "^13.6.0",
+    "dotenv": "^12.0.4"
   },
   "devDependencies": {
-    "@types/core-js": "^2.5.5",
-    "eslint": "^8.7.0"
+    "eslint": "^8.7.0",
+    "jest": "^27.5.1"
   }
 }
