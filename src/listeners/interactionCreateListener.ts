@@ -1,7 +1,12 @@
+import { findChannelById } from "../actions/channelActions";
+import {
+  updateRolesToBeAssigned,
+  takeRoles,
+  fetchListOfRolesSorted,
+} from "../actions/roleActions";
+import { updateUnchangableNameMemberList } from "../actions/userActions";
+
 const constants = require("../constants/constants.json");
-const channelActions = require(`../actions/channelActions`);
-const roleActions = require(`../actions/roleActions`);
-const userActions = require(`../actions/userActions`);
 
 export function interactionCreate(
   client: any,
@@ -19,7 +24,7 @@ export function interactionCreate(
       await interaction.reply("Commands for me are only enabled for mods");
       return;
     } else if (
-      channelActions.findChannelById(interaction.channelId, client)?.name !=
+      findChannelById(interaction.channelId, client)?.name !=
       constants.secretChannelName
     ) {
       await interaction.reply(
@@ -65,16 +70,9 @@ export function interactionCreate(
 
       case `take_roles`: {
         if (isTakeRolesOn) {
-          userActions.updateUnchangableNameMemberList(
-            client,
-            unchangableNameMemberList
-          );
-          roleActions.updateRolesToBeAssigned(
-            client,
-            rolesToBeAssigned,
-            classPrefixList
-          );
-          roleActions.takeRoles(interaction, rolesToBeAssigned);
+          updateUnchangableNameMemberList(client, unchangableNameMemberList);
+          updateRolesToBeAssigned(client, rolesToBeAssigned, classPrefixList);
+          takeRoles(interaction, rolesToBeAssigned);
         } else {
           await interaction.reply(`take_roles is currently disabled`);
         }
@@ -83,10 +81,7 @@ export function interactionCreate(
       }
 
       case `info`: {
-        userActions.updateUnchangableNameMemberList(
-          client,
-          unchangableNameMemberList
-        );
+        updateUnchangableNameMemberList(client, unchangableNameMemberList);
         await interaction.reply(
           `Server name: ${interaction!.guild!.name}\nServer id: ${
             interaction!.guild!.id
@@ -101,7 +96,7 @@ export function interactionCreate(
         break;
       }
       case `list_roles`: {
-        const roleString = roleActions.fetchListOfRolesSorted(
+        const roleString = fetchListOfRolesSorted(
           interaction!.guild!.roles.cache
         );
 

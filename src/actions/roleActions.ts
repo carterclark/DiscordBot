@@ -1,5 +1,6 @@
+import { insertionSort } from "../textParse/textParse";
+
 const constants = require("../constants/constants.json");
-const textParse = require(`../textParse/textParse`);
 
 export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
   let roleTakenCount = 0;
@@ -99,7 +100,7 @@ export function fetchListOfRolesSorted(rolesCache: any) {
       roleArray.push(role.name);
     }
   });
-  textParse.insertionSort(roleArray);
+  insertionSort(roleArray);
 
   for (const text of roleArray) {
     roleString += `\n` + text;

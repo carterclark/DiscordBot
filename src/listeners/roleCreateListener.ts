@@ -1,4 +1,4 @@
-const roleActions = require(`../actions/roleActions`);
+import { updateRolesToBeAssigned } from "../actions/roleActions";
 
 export function roleCreate(
   client: any,
@@ -6,11 +6,7 @@ export function roleCreate(
   classPrefixList: string[]
 ): void {
   client.on("roleCreate", (role: any) => {
-    roleActions.updateRolesToBeAssigned(
-      client,
-      rolesToBeAssigned,
-      classPrefixList
-    );
+    updateRolesToBeAssigned(client, rolesToBeAssigned, classPrefixList);
     console.log(`role [${role.name}] added to rolesToBeAssigned list`);
   });
 }

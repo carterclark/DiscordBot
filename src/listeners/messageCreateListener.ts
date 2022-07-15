@@ -1,8 +1,9 @@
+import { findChannelById } from "../actions/channelActions";
+import { findRoleByName, isRolePossessed } from "../actions/roleActions";
+import { updateUnchangableNameMemberList } from "../actions/userActions";
+import { hasClassPrefix } from "../textParse/textParse";
+
 const constants = require("../constants/constants.json");
-const channelActions = require(`../actions/channelActions`);
-const roleActions = require(`../actions/roleActions`);
-const userActions = require(`../actions/userActions`);
-const textParse = require(`../textParse/textParse`);
 
 export function messageCreate(
   client: any,
@@ -12,7 +13,7 @@ export function messageCreate(
   classPrefixList: string[]
 ): void {
   client.on("messageCreate", (message: any) => {
-    const channel = channelActions.findChannelById(message.channelId, client)!;
+    const channel = findChannelById(message.channelId, client)!;
 
     // console.log(`message.mentions: ${message.mentions.roles.}`); later stuff to test Carter
     if (channel.name === constants.authChannelName && isRoleAssignmentOn) {
@@ -37,15 +38,12 @@ export function messageCreate(
           console.log(`Role call initiated for ${message.author.username}`);
 
           //check is a moderator call
-          userActions.updateUnchangableNameMemberList(
-            client,
-            unchangableNameMemberList
-          );
+          updateUnchangableNameMemberList(client, unchangableNameMemberList);
 
           // to insure the first element is the persons name and not a class
           if (
             !rolesToBeAssigned.includes(splitMessage.at(0)!) &&
-            !textParse.hasClassPrefix(splitMessage.at(0)!, classPrefixList)
+            !hasClassPrefix(splitMessage.at(0)!, classPrefixList)
           ) {
             let personName = ``;
             let rolesAdded: any[] = [];
@@ -57,10 +55,10 @@ export function messageCreate(
               // REMINDER: this is needed to read in the Person role
               if (rolesToBeAssigned.includes(messageElement)) {
                 currentlyReadingName = false;
-                let role = roleActions.findRoleByName(messageElement, client)!;
+                let role = findRoleByName(messageElement, client)!;
 
                 if (
-                  !roleActions.isRolePossessed(
+                  !isRolePossessed(
                     message.author.username,
                     messageElement,
                     client
@@ -77,13 +75,13 @@ export function messageCreate(
                 rolesToBeAssigned.includes(messageElement.toUpperCase())
               ) {
                 currentlyReadingName = false;
-                let role = roleActions.findRoleByName(
+                let role = findRoleByName(
                   messageElement.toUpperCase(),
                   client
                 )!;
 
                 if (
-                  !roleActions.isRolePossessed(
+                  !isRolePossessed(
                     message.author.username,
                     messageElement.toUpperCase(),
                     client
@@ -94,9 +92,7 @@ export function messageCreate(
                 } else {
                   rolesSkipped.push(role.name);
                 }
-              } else if (
-                textParse.hasClassPrefix(messageElement, classPrefixList)
-              ) {
+              } else if (hasClassPrefix(messageElement, classPrefixList)) {
                 currentlyReadingName = false;
                 rolesSkipped.push(messageElement);
               }

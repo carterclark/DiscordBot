@@ -1,12 +1,12 @@
+import { interactionCreate } from "./listeners/interactionCreateListener";
+import { messageCreate } from "./listeners/messageCreateListener";
+import { ready } from "./listeners/botReadyListener";
+import { roleCreate } from "./listeners/roleCreateListener";
+import { uncaughtException } from "./listeners/uncaughtExceptionListener";
+import { Client, Intents } from "discord.js";
+
 const dotenv = require("dotenv");
 dotenv.config();
-
-const { Client, Intents } = require(`discord.js`);
-const uncaughtExceptionListener = require(`./listeners/uncaughtExceptionListener`);
-const readyListener = require(`./listeners/readyListener`);
-const messageCreateListener = require(`./listeners/messageCreateListener`);
-const interactionCreateListener = require(`./listeners/interactionCreateListener`);
-const roleCreateListener = require(`./listeners/roleCreateListener`);
 
 let rolesToBeAssigned: string[] = [];
 let unchangableNameMemberList: string[] = [];
@@ -24,18 +24,13 @@ const client = new Client({
 });
 
 //listeners
-uncaughtExceptionListener.uncaughtException(process, client);
+uncaughtException(process, client);
 
-readyListener.ready(
-  client,
-  unchangableNameMemberList,
-  rolesToBeAssigned,
-  classPrefixList
-);
+ready(client, unchangableNameMemberList, rolesToBeAssigned, classPrefixList);
 
-roleCreateListener.roleCreate(client, rolesToBeAssigned, classPrefixList);
+roleCreate(client, rolesToBeAssigned, classPrefixList);
 
-messageCreateListener.messageCreate(
+messageCreate(
   client,
   isRoleAssignmentOn,
   unchangableNameMemberList,
@@ -43,7 +38,7 @@ messageCreateListener.messageCreate(
   classPrefixList
 );
 
-interactionCreateListener.interactionCreate(
+interactionCreate(
   client,
   unchangableNameMemberList,
   isRoleAssignmentOn,
