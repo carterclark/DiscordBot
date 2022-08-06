@@ -10,8 +10,8 @@
    - `BOT_AUTH_TOKEN`, can be found in the discord develeper portal. After selecting the app go to Bot.
    - `CLIENT_ID`, can be found in the discord develeper portal. After selecting the app go to OAuth2.
    - `SERVER_ID`, can be found under `widget` in the server settings on discord
-6. If running the bot for the first time or changing bot commands, enter the termainal and cd to the root directory then run `npm commands`.
-7. Run the command `npm start` from the root directory
+6. If running the bot for the first time or changing bot commands, enter the termainal and cd to the root directory then run `yarn commands`.
+7. Run the command `yarn start` from the root directory
 
 ### Making Discord Bot
 
@@ -37,12 +37,6 @@
 - [node.js](https://nodejs.org/en/docs/)
 - [discord.js](https://discord.js.org/#/docs/main/stable/general/welcome)
 - [typescript](https://www.typescriptlang.org/docs/)
-
-## Commands
-
-- Start app: `node index.js`
-- Deploy new commands for bot: `node deploy-commands.js`
-- Run tests: `npm run test`
 
 ### Links
 

@@ -1,17 +1,24 @@
 {
-    "topRoles": [
-        "KING",
-        "Server Booster",
-        "Industry Expert",
-        "Moderator",
-        "Bot Manager",
-        "dev_bot",
-        "prod_bot"
-    ],
-    "everyoneRole": "@everyone",
-    "personRole": "Person",
-    "authChannelName": "authorization",
-    "secretChannelName": "secret-secret",
-    "botLogChannelName": "bot-logs",
-    "messageRoleFormat": "'@Moderator [YOUR NAME] [CLASS-1], [CLASS-2], ...'"
+  "topRoles": [
+    "KING",
+    "Server Booster",
+    "Industry Expert",
+    "Moderator",
+    "Bot Manager",
+    "dev_bot",
+    "prod_bot"
+  ],
+  "everyoneRole": "@everyone",
+  "personRole": "Person",
+  "authChannelName": "authorization",
+  "secretChannelName": "secret-secret",
+  "botLogChannelName": "bot-logs",
+  "messageRoleFormat": "'/role_me [YOUR NAME] [CLASS-1], [CLASS-2], ...'",
+  "secretChannelCommands": [
+    "info",
+    "list_roles",
+    "enable_take_roles",
+    "disable_take_roles",
+    "take_roles"
+  ]
 }

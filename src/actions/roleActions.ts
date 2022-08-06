@@ -1,4 +1,9 @@
-import { insertionSort } from "../textParse/textParse";
+import { Client, CommandInteraction, Role } from "discord.js";
+import { hasClassPrefix, insertionSort } from "../textParse/textParse";
+import {
+  setUserNickname,
+  updateUnchangableNameMemberList,
+} from "./userActions";
 
 const constants = require("../constants/constants.json");
 
@@ -36,11 +41,11 @@ export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
   );
 }
 
-export function isRolePossessed(
+export function isRolePossessedSearch(
   username: String,
   roleName: String,
   client: any
-) {
+): boolean {
   const server = client.guilds.cache.get(String(process.env.SERVER_ID));
   let hasRole = false;
 
@@ -123,5 +128,106 @@ export function addToClassPrefixList(
     }
 
     prefix += text;
+  }
+}
+
+export function roleIsInMemberCache(member: any, roleToCheck: string): boolean {
+  const tempRole = member.roles.cache.find(
+    (role: { name: string }) => role.name === roleToCheck
+  );
+  return tempRole !== undefined;
+}
+
+export function addRoleToMember(member: any, role: Role) {
+  member.roles.add(role);
+}
+
+export function checksForAndAddsPersonRole(
+  interaction: any,
+  client: Client
+): boolean {
+  const hasPersonRole = roleIsInMemberCache(
+    interaction.member!,
+    constants.personRole
+  );
+
+  if (!hasPersonRole) {
+    const personRole = findRoleByName(constants.personRole, client);
+    addRoleToMember(interaction.member, personRole);
+  }
+  return hasPersonRole;
+}
+
+export async function roleMeCommand(
+  interaction: CommandInteraction,
+  authorUsername: string,
+  client: Client,
+  unchangableNameMemberList: string[],
+  rolesToBeAssigned: string[],
+  classPrefixList: string[]
+) {
+  const message = interaction.options.getString("input", true);
+  let splitMessage: string[] = message.split(",").join("").split(` `);
+  console.log(`Role call initiated for ${authorUsername}`);
+
+  updateUnchangableNameMemberList(client, unchangableNameMemberList);
+
+  // to insure the first element is the persons name and not a class
+  if (
+    !rolesToBeAssigned.includes(splitMessage.at(0)!) &&
+    !hasClassPrefix(splitMessage.at(0)!, classPrefixList)
+  ) {
+    let personName = ``;
+    let rolesAdded: any[] = [];
+    let rolesSkipped: any[] = [];
+    let currentlyReadingName = true;
+
+    if (!checksForAndAddsPersonRole(interaction, client)) {
+      rolesAdded.push(constants.personRole);
+    }
+
+    for (const messageElement of splitMessage) {
+      const messageElementUpper = messageElement.toUpperCase();
+      if (rolesToBeAssigned.includes(messageElementUpper)) {
+        currentlyReadingName = false;
+        let roleToBeAdded = findRoleByName(
+          messageElement.toUpperCase(),
+          client
+        )!;
+
+        if (!roleIsInMemberCache(interaction.member, messageElementUpper)) {
+          addRoleToMember(interaction.member, roleToBeAdded);
+          rolesAdded.push(roleToBeAdded.name);
+        } else if (hasClassPrefix(messageElement, classPrefixList)) {
+          currentlyReadingName = false;
+          rolesSkipped.push(messageElementUpper);
+        }
+        // still reading name
+        else if (currentlyReadingName) {
+          personName += messageElement + ` `;
+        }
+        // element is after the name but not recongnized as a role
+        else {
+          rolesSkipped.push(messageElement);
+        }
+      }
+    }
+    personName = personName.slice(0, -1);
+    if (unchangableNameMemberList.includes(authorUsername)) {
+      personName = `couldn't change nickname to "${personName}", role is above the bot`;
+    } else {
+      setUserNickname(interaction.member, personName);
+    }
+
+    await interaction.reply(
+      `message: ${message}\n\n` +
+        `username: ${authorUsername}` +
+        `\nnickname: "${personName}"\nroles added: [${rolesAdded}]` +
+        `\nroles skipped: [${rolesSkipped}]`
+    );
+  } else {
+    await interaction.reply(
+      `message: ${message}\n\nIt appears the first element in your message is a class name. \nReminder, the format is ${constants.messageRoleFormat}`
+    );
   }
 }

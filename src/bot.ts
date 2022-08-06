@@ -11,8 +11,7 @@ dotenv.config();
 let rolesToBeAssigned: string[] = [];
 let unchangableNameMemberList: string[] = [];
 let classPrefixList: string[] = [];
-let isRoleAssignmentOn = true;
-let isTakeRolesOn = false;
+let isTakeRolesOn = { value: false };
 
 const client = new Client({
   intents: [
@@ -23,25 +22,18 @@ const client = new Client({
   ],
 });
 
-//listeners
 uncaughtException(process, client);
-
 ready(client, unchangableNameMemberList, rolesToBeAssigned, classPrefixList);
-
 roleCreate(client, rolesToBeAssigned, classPrefixList);
-
 messageCreate(
   client,
-  isRoleAssignmentOn,
   unchangableNameMemberList,
   rolesToBeAssigned,
   classPrefixList
 );
-
 interactionCreate(
   client,
   unchangableNameMemberList,
-  isRoleAssignmentOn,
   isTakeRolesOn,
   rolesToBeAssigned,
   classPrefixList

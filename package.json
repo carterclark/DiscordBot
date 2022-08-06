@@ -9,7 +9,7 @@
   "main": "bot.js",
   "scripts": {
     "start": "ts-node src/bot.ts",
-    "commands": "ts-node src/deploy-commands.ts"
+    "commands": "node deploy-commands.js"
   },
   "author": "Carter Clark",
   "license": "ISC",

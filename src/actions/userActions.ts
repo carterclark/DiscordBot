@@ -1,3 +1,5 @@
+import { GuildMember } from "discord.js";
+
 const constants = require("../constants/constants.json");
 
 export function updateUnchangableNameMemberList(
@@ -21,4 +23,9 @@ export function updateUnchangableNameMemberList(
       }
     }
   );
+}
+
+export function setUserNickname(member: any, newNickname: string) {
+  member.setNickname("");
+  member.setNickname(newNickname);
 }
