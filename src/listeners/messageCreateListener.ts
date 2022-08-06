@@ -14,7 +14,7 @@ export function messageCreate(client: any): void {
         .split(` `);
       if (isModeratorCall(splitMessage, message)) {
         message.reply(
-          `@moderator is depreciated, please replace it with "/role_me"\nreminder, the format is ${constants.messageRoleFormat}`
+          `@moderator is no longer supported, please replace it with "/role_me"\nreminder, the format is ${constants.messageRoleFormat}`
         );
       }
     }
