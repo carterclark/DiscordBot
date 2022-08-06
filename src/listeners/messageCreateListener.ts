@@ -1,17 +1,9 @@
 import { Message } from "discord.js";
 import { findChannelById } from "../actions/channelActions";
-import { findRoleByName, isRolePossessedSearch } from "../actions/roleActions";
-import { updateUnchangableNameMemberList } from "../actions/userActions";
-import { hasClassPrefix } from "../textParse/textParse";
 
 const constants = require("../constants/constants.json");
 
-export function messageCreate(
-  client: any,
-  unchangableNameMemberList: string[],
-  rolesToBeAssigned: string[],
-  classPrefixList: string[]
-): void {
+export function messageCreate(client: any): void {
   client.on("messageCreate", (message: Message) => {
     const channel = findChannelById(message.channelId, client)!;
 

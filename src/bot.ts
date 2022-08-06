@@ -25,12 +25,7 @@ const client = new Client({
 uncaughtException(process, client);
 ready(client, unchangableNameMemberList, rolesToBeAssigned, classPrefixList);
 roleCreate(client, rolesToBeAssigned, classPrefixList);
-messageCreate(
-  client,
-  unchangableNameMemberList,
-  rolesToBeAssigned,
-  classPrefixList
-);
+messageCreate(client);
 interactionCreate(
   client,
   unchangableNameMemberList,
