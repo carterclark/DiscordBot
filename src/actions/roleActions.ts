@@ -188,28 +188,36 @@ export async function roleMeCommand(
 
     for (const messageElement of splitMessage) {
       const messageElementUpper = messageElement.toUpperCase();
+
+      // this is a recognized role
       if (rolesToBeAssigned.includes(messageElementUpper)) {
         currentlyReadingName = false;
-        let roleToBeAdded = findRoleByName(
-          messageElement.toUpperCase(),
-          client
-        )!;
+        let roleToBeAdded = findRoleByName(messageElementUpper, client)!;
 
+        // role is recognized as a role to be assigned and member does not have it
         if (!roleIsInMemberCache(interaction.member, messageElementUpper)) {
           addRoleToMember(interaction.member, roleToBeAdded);
           rolesAdded.push(roleToBeAdded.name);
-        } else if (hasClassPrefix(messageElement, classPrefixList)) {
+        }
+
+        // this is a recognized role but the member already has it
+        else {
           currentlyReadingName = false;
           rolesSkipped.push(messageElementUpper);
         }
-        // still reading name
-        else if (currentlyReadingName) {
-          personName += messageElement + ` `;
-        }
-        // element is after the name but not recongnized as a role
-        else {
-          rolesSkipped.push(messageElement);
-        }
+      }
+      // not a recognized role but is a class prefix
+      else if (hasClassPrefix(messageElement, classPrefixList)) {
+        currentlyReadingName = false;
+        rolesSkipped.push(messageElementUpper);
+      }
+      // still reading name
+      else if (currentlyReadingName) {
+        personName += messageElement + ` `;
+      }
+      // element is after the name but not recongnized as a class
+      else {
+        rolesSkipped.push(messageElement);
       }
     }
     personName = personName.slice(0, -1);
