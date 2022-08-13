@@ -23,15 +23,14 @@ export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
           rolesToBeAssigned.includes(role.name) &&
           role.name != constants.personRole
         ) {
-          classRoleTakenCount++;
           member.roles.remove(role);
           console.log(`removing ${role.name} from ${member.displayName}`);
           if (userNotCounted) {
             userWithRoleTakenCount++;
             userNotCounted = false;
           }
-          if (role.name == constants.currentStudentRole) {
-            classRoleTakenCount--;
+          if (role.name !== constants.currentStudentRole) {
+            classRoleTakenCount++;
           }
         }
       });
