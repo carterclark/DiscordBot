@@ -8,7 +8,7 @@ import {
 const constants = require("../constants/constants.json");
 
 export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
-  let roleTakenCount = 0;
+  let classRoleTakenCount = 0;
   let userWithRoleTakenCount = 0;
   let userNotCounted: boolean;
 
@@ -23,12 +23,15 @@ export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
           rolesToBeAssigned.includes(role.name) &&
           role.name != constants.personRole
         ) {
-          roleTakenCount++;
+          classRoleTakenCount++;
           member.roles.remove(role);
           console.log(`removing ${role.name} from ${member.displayName}`);
           if (userNotCounted) {
             userWithRoleTakenCount++;
             userNotCounted = false;
+          }
+          if (role.name == constants.currentStudentRole) {
+            classRoleTakenCount--;
           }
         }
       });
@@ -36,7 +39,7 @@ export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
   );
 
   await interaction.reply(
-    `take_roles removed ${roleTakenCount} roles from ${userWithRoleTakenCount} users` +
+    `take_roles removed ${classRoleTakenCount} class roles from ${userWithRoleTakenCount} users` +
       ` in ${interaction!.guild!.name}`
   );
 }
@@ -142,20 +145,18 @@ export function addRoleToMember(member: any, role: Role) {
   member.roles.add(role);
 }
 
-export function checksForAndAddsPersonRole(
+export function checksForAndAddsRole(
+  roleName: string,
   interaction: any,
   client: Client
 ): boolean {
-  const hasPersonRole = roleIsInMemberCache(
-    interaction.member!,
-    constants.personRole
-  );
+  const hasRole = roleIsInMemberCache(interaction.member!, roleName);
 
-  if (!hasPersonRole) {
-    const personRole = findRoleByName(constants.personRole, client);
-    addRoleToMember(interaction.member, personRole);
+  if (!hasRole) {
+    const roleToBeAdded = findRoleByName(roleName, client);
+    addRoleToMember(interaction.member, roleToBeAdded);
   }
-  return hasPersonRole;
+  return hasRole;
 }
 
 export async function roleMeCommand(
@@ -182,8 +183,14 @@ export async function roleMeCommand(
     let rolesSkipped: any[] = [];
     let currentlyReadingName = true;
 
-    if (!checksForAndAddsPersonRole(interaction, client)) {
+    if (!checksForAndAddsRole(constants.personRole, interaction, client)) {
       rolesAdded.push(constants.personRole);
+    }
+
+    if (
+      !checksForAndAddsRole(constants.currentStudentRole, interaction, client)
+    ) {
+      rolesAdded.push(constants.currentStudentRole);
     }
 
     for (const messageElement of splitMessage) {

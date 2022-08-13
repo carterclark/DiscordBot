@@ -10,6 +10,7 @@
   ],
   "everyoneRole": "@everyone",
   "personRole": "Person",
+  "currentStudentRole": "Current-Student",
   "authChannelName": "authorization",
   "secretChannelName": "secret-secret",
   "botLogChannelName": "bot-logs",
