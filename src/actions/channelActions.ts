@@ -70,6 +70,7 @@ export async function secretChannelResponses(
         `Server name: ${interaction!.guild!.name}\nServer id: ${
           interaction!.guild!.id
         }\n` +
+          `classPrefixList: [${classPrefixList}]\n` +
           `isTakeRolesOn: ${isTakeRolesOn.value}\n` +
           `topRoles: [${constants.topRoles}]\n` +
           `unchangableNameMemberList(updated): [${unchangableNameMemberList}]`

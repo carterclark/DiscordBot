@@ -20,7 +20,7 @@ const commands = [
     .setDescription("Gives info about server"),
   new SlashCommandBuilder()
     .setName("list_roles")
-    .setDescription("Replies with a list of roles in the server"),
+    .setDescription("Replies with a sorted list of roles in the server"),
   new SlashCommandBuilder()
     .setName("enable_take_roles")
     .setDescription("Turns take_roles on"),

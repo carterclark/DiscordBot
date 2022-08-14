@@ -1,3 +1,4 @@
+import { Role } from "discord.js";
 import { updateRolesToBeAssigned } from "../actions/roleActions";
 
 export function roleUpdate(
@@ -5,8 +6,7 @@ export function roleUpdate(
   rolesToBeAssigned: string[],
   classPrefixList: string[]
 ): void {
-  client.on("roleUpdate", (role: any) => {
+  client.on("roleUpdate", (role: Role) => {
     updateRolesToBeAssigned(client, rolesToBeAssigned, classPrefixList);
-    console.log(`role [${role.name}] added to rolesToBeAssigned list`);
   });
 }

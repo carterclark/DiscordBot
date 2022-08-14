@@ -89,6 +89,7 @@ export function updateRolesToBeAssigned(
       constants.everyoneRole !== role.name
     ) {
       rolesToBeAssigned.push(role.name);
+      console.log(`role [${role.name}] added to rolesToBeAssigned list`);
       addToClassPrefixList(role.name, classPrefixList);
     }
   });
@@ -126,6 +127,7 @@ export function addToClassPrefixList(
   for (const text of textArray) {
     if (text == "-" && !classPrefixList.includes(prefix)) {
       classPrefixList.push(prefix);
+      console.log(`prefix [${prefix}] added to classPrefixList`);
       break;
     }
 
