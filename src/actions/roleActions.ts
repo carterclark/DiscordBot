@@ -155,7 +155,7 @@ export function checksForAndAddsRole(
 
   if (!hasRole) {
     const roleToBeAdded = findRoleByName(roleName, client);
-    addRoleToMember(interaction.member, roleToBeAdded);
+    interaction.member.roles.add(roleToBeAdded);
   }
   return hasRole;
 }
@@ -186,12 +186,16 @@ export async function roleMeCommand(
 
     if (!checksForAndAddsRole(constants.personRole, interaction, client)) {
       rolesAdded.push(constants.personRole);
+      console.log(`Role ${constants.personRole} added to ${authorUsername}`);
     }
 
     if (
       !checksForAndAddsRole(constants.currentStudentRole, interaction, client)
     ) {
       rolesAdded.push(constants.currentStudentRole);
+      console.log(
+        `Role ${constants.currentStudentRole} added to ${authorUsername}`
+      );
     }
 
     for (const messageElement of splitMessage) {
@@ -206,6 +210,7 @@ export async function roleMeCommand(
         if (!roleIsInMemberCache(interaction.member, messageElementUpper)) {
           addRoleToMember(interaction.member, roleToBeAdded);
           rolesAdded.push(roleToBeAdded.name);
+          console.log(`Role ${roleToBeAdded.name} added to ${authorUsername}`);
         }
 
         // this is a recognized role but the member already has it
