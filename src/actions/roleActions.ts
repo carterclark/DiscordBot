@@ -170,7 +170,7 @@ export async function roleMeCommand(
 ) {
   const message = interaction.options.getString("input", true);
   let splitMessage: string[] = message.split(",").join("").split(` `);
-  console.log(`Role call initiated for ${authorUsername}`);
+  console.log(`\nRole call initiated for ${authorUsername}`);
 
   updateUnchangableNameMemberList(client, unchangableNameMemberList);
 

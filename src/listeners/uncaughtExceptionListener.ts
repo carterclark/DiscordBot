@@ -7,9 +7,7 @@ export function uncaughtException(process: NodeJS.Process, client: any): void {
     console.log(error.stack);
     const logChannel = findChannelByName(constants.botLogChannelName, client);
     logChannel.send(
-      `Something broke, check the logs. \n{${error.name} : ${error.message}}`
+      `Something broke, check the logs. \n${error.name} : ${error.message}\n${error.stack}`
     );
   });
 }
-
-module.exports = { uncaughtException };
