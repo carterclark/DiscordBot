@@ -35,5 +35,3 @@ export function ready(
     logChannel.send(logString);
   });
 }
-
-module.exports = { ready };

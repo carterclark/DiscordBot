@@ -41,5 +41,3 @@ function isModeratorCall(splitMessage: string[], message: Message): boolean {
 
   return false;
 }
-
-module.exports = { messageCreate };
