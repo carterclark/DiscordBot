@@ -7,7 +7,7 @@ export function messageCreate(client: any): void {
   client.on("messageCreate", (message: Message) => {
     const channel = findChannelById(message.channelId, client)!;
 
-    if (channel.name === constants.authChannelName) {
+    if (channel.name === constants.authChannelName && !message.author.bot) {
       let splitMessage: string[] = message.content
         .split(",")
         .join("")
