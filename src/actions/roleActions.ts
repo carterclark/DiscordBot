@@ -11,6 +11,8 @@ export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
   let classRoleTakenCount = 0;
   let userWithRoleTakenCount = 0;
   let userNotCounted: boolean;
+  let rolesToBeRemoved: Role[] = [];
+  let rolesRemovedNames: string[] = [];
 
   interaction.guild!.members.cache.forEach(
     (member: {
@@ -18,13 +20,13 @@ export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
       displayName: any;
     }) => {
       userNotCounted = true;
-      member.roles.cache.forEach((role: { name: string }) => {
+      member.roles.cache.forEach((role: Role) => {
         if (
           rolesToBeAssigned.includes(role.name) &&
           role.name != constants.personRole
         ) {
-          member.roles.remove(role);
-          console.log(`removing ${role.name} from ${member.displayName}`);
+          rolesToBeRemoved.push(role);
+          rolesRemovedNames.push(role.name);
           if (userNotCounted) {
             userWithRoleTakenCount++;
             userNotCounted = false;
@@ -34,6 +36,14 @@ export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
           }
         }
       });
+
+      if (rolesToBeRemoved.length !== 0) {
+        member.roles.remove(rolesToBeRemoved);
+        console.log(`removing ${rolesRemovedNames} from ${member.displayName}`);
+
+        rolesToBeRemoved = [];
+        rolesRemovedNames = [];
+      }
     }
   );
 
