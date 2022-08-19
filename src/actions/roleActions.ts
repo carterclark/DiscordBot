@@ -66,7 +66,7 @@ export function isRolePossessedSearch(
   return hasRole;
 }
 
-export function findRoleByName(roleName: String, client: any) {
+export function findRoleByName(roleName: String, client: any): Role {
   const server = client.guilds.cache.get(String(process.env.SERVER_ID));
   let roleFound = server!.roles.cache.find(
     (role: { name: String }) => role.name === roleName
@@ -142,22 +142,8 @@ export function roleIsInMemberCache(member: any, roleToCheck: string): boolean {
   return tempRole !== undefined;
 }
 
-export function addRoleToMember(member: any, role: Role) {
+export function addRolesToMember(member: any, role: Role[]) {
   member.roles.add(role);
-}
-
-export function checksForAndAddsRole(
-  roleName: string,
-  interaction: any,
-  client: Client
-): boolean {
-  const hasRole = roleIsInMemberCache(interaction.member!, roleName);
-
-  if (!hasRole) {
-    const roleToBeAdded = findRoleByName(roleName, client);
-    interaction.member.roles.add(roleToBeAdded);
-  }
-  return hasRole;
 }
 
 export async function roleMeCommand(
@@ -180,22 +166,21 @@ export async function roleMeCommand(
     !hasClassPrefix(splitMessage.at(0)!, classPrefixList)
   ) {
     let personName = ``;
-    let rolesAdded: any[] = [];
+    let rolesToBeAdded: any[] = [];
+    let roleNamesAdded: string[] = [];
     let rolesSkipped: any[] = [];
     let currentlyReadingName = true;
 
-    if (!checksForAndAddsRole(constants.personRole, interaction, client)) {
-      rolesAdded.push(constants.personRole);
-      console.log(`Role ${constants.personRole} added to ${authorUsername}`);
+    if (!roleIsInMemberCache(interaction.member, constants.personRole)) {
+      rolesToBeAdded.push(findRoleByName(constants.personRole, client));
+      roleNamesAdded.push(constants.personRole);
     }
 
     if (
-      !checksForAndAddsRole(constants.currentStudentRole, interaction, client)
+      !roleIsInMemberCache(interaction.member, constants.currentStudentRole)
     ) {
-      rolesAdded.push(constants.currentStudentRole);
-      console.log(
-        `Role ${constants.currentStudentRole} added to ${authorUsername}`
-      );
+      rolesToBeAdded.push(findRoleByName(constants.currentStudentRole, client));
+      roleNamesAdded.push(constants.currentStudentRole);
     }
 
     for (const messageElement of splitMessage) {
@@ -208,9 +193,8 @@ export async function roleMeCommand(
 
         // role is recognized as a role to be assigned and member does not have it
         if (!roleIsInMemberCache(interaction.member, messageElementUpper)) {
-          addRoleToMember(interaction.member, roleToBeAdded);
-          rolesAdded.push(roleToBeAdded.name);
-          console.log(`Role ${roleToBeAdded.name} added to ${authorUsername}`);
+          rolesToBeAdded.push(roleToBeAdded);
+          roleNamesAdded.push(roleToBeAdded.name);
         }
 
         // this is a recognized role but the member already has it
@@ -233,6 +217,10 @@ export async function roleMeCommand(
         rolesSkipped.push(messageElement);
       }
     }
+
+    addRolesToMember(interaction.member, rolesToBeAdded);
+    console.log(`Roles ${roleNamesAdded} added to ${authorUsername}`);
+
     personName = personName.slice(0, -1);
     if (unchangableNameMemberList.includes(authorUsername)) {
       personName = `couldn't change nickname to "${personName}", role is above the bot`;
@@ -243,7 +231,7 @@ export async function roleMeCommand(
     await interaction.reply(
       `message: ${message}\n\n` +
         `username: ${authorUsername}` +
-        `\nnickname: "${personName}"\nroles added: [${rolesAdded}]` +
+        `\nnickname: "${personName}"\nroles added: [${roleNamesAdded}]` +
         `\nroles skipped: [${rolesSkipped}]`
     );
   } else {
