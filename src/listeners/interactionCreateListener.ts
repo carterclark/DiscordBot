@@ -1,9 +1,6 @@
-import {
-  findChannelById,
-  secretChannelResponses,
-} from "../actions/channelActions";
+import { secretChannelResponses } from "../actions/channelActions";
 import { roleMeCommand } from "../actions/roleActions";
-import { Client, Interaction } from "discord.js";
+import { Client } from "discord.js";
 
 const constants = require("../constants/constants.json");
 
@@ -14,17 +11,16 @@ export function interactionCreate(
   rolesToBeAssigned: string[],
   classPrefixList: string[]
 ): void {
-  client.on(`interactionCreate`, async (interaction: Interaction) => {
-    let channelName = findChannelById(interaction.channelId!, client)?.name;
-    let authorUsername = interaction.member!.user.username;
-
+  client.on(`interactionCreate`, async (interaction: any) => {
     if (!interaction.isCommand() || interaction === null) return;
 
     const { commandName } = interaction;
+    const channelName = interaction.channel.name;
+    const authorUsername = interaction.member.user.username;
 
     if (
       channelName === constants.authChannelName &&
-      commandName === `role_me`
+      commandName === constants.roleMeCommand
     ) {
       roleMeCommand(
         interaction,

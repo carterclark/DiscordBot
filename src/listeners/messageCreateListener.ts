@@ -1,13 +1,12 @@
 import { Message } from "discord.js";
-import { findChannelById } from "../actions/channelActions";
 
 const constants = require("../constants/constants.json");
 
 export function messageCreate(client: any): void {
-  client.on("messageCreate", (message: Message) => {
-    const channel = findChannelById(message.channelId, client)!;
+  client.on("messageCreate", (message: any) => {
+    const channelName = message.channel.name;
 
-    if (channel.name === constants.authChannelName && !message.author.bot) {
+    if (channelName === constants.authChannelName && !message.author.bot) {
       let splitMessage: string[] = message.content
         .split(",")
         .join("")

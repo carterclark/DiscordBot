@@ -15,11 +15,5 @@
   "secretChannelName": "secret-secret",
   "botLogChannelName": "bot-logs",
   "messageRoleFormat": "'/role_me [YOUR NAME] [CLASS-1], [CLASS-2], ...'",
-  "secretChannelCommands": [
-    "info",
-    "list_roles",
-    "enable_take_roles",
-    "disable_take_roles",
-    "take_roles"
-  ]
+  "roleMeCommand": "role_me"
 }
