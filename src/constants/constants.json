@@ -11,6 +11,7 @@
   "everyoneRole": "@everyone",
   "personRole": "Person",
   "currentStudentRole": "Current_Student",
+  "newRoleName": "new role",
   "authChannelName": "authorization",
   "secretChannelName": "secret-secret",
   "botLogChannelName": "bot-logs",

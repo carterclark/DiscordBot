@@ -86,7 +86,8 @@ export function updateRolesToBeAssigned(
     if (
       !constants.topRoles.includes(role.name) &&
       !rolesToBeAssigned.includes(role.name) &&
-      constants.everyoneRole !== role.name
+      constants.everyoneRole !== role.name &&
+      constants.newRoleName !== role.name
     ) {
       rolesToBeAssigned.push(role.name);
       console.log(`role [${role.name}] added to rolesToBeAssigned list`);
