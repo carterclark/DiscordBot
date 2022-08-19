@@ -1,5 +1,4 @@
 import { interactionCreate } from "./listeners/interactionCreateListener";
-import { messageCreate } from "./listeners/messageCreateListener";
 import { ready } from "./listeners/botReadyListener";
 import { roleUpdate } from "./listeners/roleUpdateListener";
 import { uncaughtException } from "./listeners/uncaughtExceptionListener";
@@ -25,7 +24,6 @@ const client = new Client({
 uncaughtException(process, client);
 ready(client, unchangableNameMemberList, rolesToBeAssigned, classPrefixList);
 roleUpdate(client, rolesToBeAssigned, classPrefixList);
-messageCreate(client);
 interactionCreate(
   client,
   unchangableNameMemberList,
