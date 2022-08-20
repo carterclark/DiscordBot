@@ -2,17 +2,21 @@ import { Client, CommandInteraction, Role } from "discord.js";
 import { hasClassPrefix, insertionSort } from "../textParse/textParse";
 import {
   setUserNickname,
-  updateUnchangableNameMemberList,
+  updateUnchangableNameMemberList as syncUnchangableNameMemberList,
 } from "./userActions";
 
 const constants = require("../constants/constants.json");
 
-export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
+export async function takeRoles(
+  interaction: any,
+  roleNamesToRoles: Map<string, Role>
+) {
   let classRoleTakenCount = 0;
   let userWithRoleTakenCount = 0;
   let userNotCounted: boolean;
   let rolesToBeRemoved: Role[] = [];
   let rolesRemovedNames: string[] = [];
+  const rolesToBeAssigned: String[] = Array.from(roleNamesToRoles.keys());
 
   interaction.guild!.members.cache.forEach(
     (member: {
@@ -39,7 +43,9 @@ export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
 
       if (rolesToBeRemoved.length !== 0) {
         member.roles.remove(rolesToBeRemoved);
-        console.log(`removing ${rolesRemovedNames} from ${member.displayName}`);
+        console.log(
+          `Removing [${rolesRemovedNames}] from ${member.displayName}`
+        );
 
         rolesToBeRemoved = [];
         rolesRemovedNames = [];
@@ -53,55 +59,25 @@ export async function takeRoles(interaction: any, rolesToBeAssigned: string[]) {
   );
 }
 
-export function isRolePossessedSearch(
-  username: String,
-  roleName: String,
-  client: any
-): boolean {
-  const server = client.guilds.cache.get(String(process.env.SERVER_ID));
-  let hasRole = false;
-
-  server!.members.cache.forEach(
-    (member: { user: { username: String }; roles: { cache: any[] } }) => {
-      if (member.user.username === username) {
-        member.roles.cache.forEach((role: { name: String }) => {
-          if (role.name === roleName) {
-            hasRole = true;
-          }
-        });
-      }
-    }
-  );
-
-  return hasRole;
-}
-
-export function findRoleByName(roleName: String, client: any): Role {
-  const server = client.guilds.cache.get(String(process.env.SERVER_ID));
-  let roleFound = server!.roles.cache.find(
-    (role: { name: String }) => role.name === roleName
-  );
-
-  return roleFound;
-}
-
-export function updateRolesToBeAssigned(
+export function syncRolesToBeAssigned(
   client: any,
-  rolesToBeAssigned: String[],
+  roleNamesToRoles: Map<string, Role>,
   classPrefixList: String[]
 ) {
   const server = client.guilds.cache.get(String(process.env.SERVER_ID));
+  const rolesToBeAssigned: String[] = Array.from(roleNamesToRoles.keys());
 
-  server!.roles.cache.forEach((role: { name: String }) => {
+  server!.roles.cache.forEach((role: Role) => {
+    const roleName = role.name;
     if (
-      !constants.topRoles.includes(role.name) &&
-      !rolesToBeAssigned.includes(role.name) &&
-      constants.everyoneRole !== role.name &&
-      constants.newRoleName !== role.name
+      !constants.topRoles.includes(roleName) &&
+      !rolesToBeAssigned.includes(roleName) &&
+      constants.everyoneRole !== roleName &&
+      constants.newRoleName !== roleName
     ) {
-      rolesToBeAssigned.push(role.name);
-      console.log(`role [${role.name}] added to rolesToBeAssigned list`);
-      addToClassPrefixList(role.name, classPrefixList);
+      roleNamesToRoles.set(roleName, role);
+      console.log(`role [${roleName}] added to roleNamesToRoles list`);
+      addToClassPrefixList(roleName, classPrefixList);
     }
   });
 }
@@ -110,13 +86,14 @@ export function fetchListOfRolesSorted(rolesCache: any) {
   let roleArray: String[] = [];
   let roleString: String = ``;
 
-  rolesCache.forEach((role: any) => {
+  rolesCache.forEach((role: Role) => {
+    const roleName = role.name;
     if (
-      constants.everyoneRole !== role.name &&
-      constants.personRole !== role.name &&
-      !constants.topRoles.includes(role.name)
+      constants.everyoneRole !== roleName &&
+      constants.personRole !== roleName &&
+      !constants.topRoles.includes(roleName)
     ) {
-      roleArray.push(role.name);
+      roleArray.push(roleName);
     }
   });
   insertionSort(roleArray);
@@ -162,20 +139,21 @@ export async function roleMeCommand(
   authorUsername: string,
   client: Client,
   unchangableNameMemberList: string[],
-  rolesToBeAssigned: string[],
+  roleNamesToRoles: Map<string, Role>,
   classPrefixList: string[]
 ) {
   const message = interaction.options.getString("input", true);
+  const rolesToBeAssigned: String[] = Array.from(roleNamesToRoles.keys());
   let splitMessage: string[] = message.split(",").join("").split(` `);
-  console.log(`\nRole call initiated for ${authorUsername}`);
-
-  updateUnchangableNameMemberList(client, unchangableNameMemberList);
+  const firstElement = splitMessage.at(0)!;
 
   // to insure the first element is the persons name and not a class
   if (
-    !rolesToBeAssigned.includes(splitMessage.at(0)!) &&
-    !hasClassPrefix(splitMessage.at(0)!, classPrefixList)
+    !rolesToBeAssigned.includes(firstElement) &&
+    !hasClassPrefix(firstElement, classPrefixList)
   ) {
+    console.log(`\nrole_me call initiated for ${authorUsername}`);
+    syncUnchangableNameMemberList(client, unchangableNameMemberList);
     let personName = ``;
     let rolesToBeAdded: any[] = [];
     let roleNamesAdded: string[] = [];
@@ -183,14 +161,14 @@ export async function roleMeCommand(
     let currentlyReadingName = true;
 
     if (!roleIsInMemberCache(interaction.member, constants.personRole)) {
-      rolesToBeAdded.push(findRoleByName(constants.personRole, client));
+      rolesToBeAdded.push(roleNamesToRoles.get(constants.personRole));
       roleNamesAdded.push(constants.personRole);
     }
 
     if (
       !roleIsInMemberCache(interaction.member, constants.currentStudentRole)
     ) {
-      rolesToBeAdded.push(findRoleByName(constants.currentStudentRole, client));
+      rolesToBeAdded.push(roleNamesToRoles.get(constants.currentStudentRole));
       roleNamesAdded.push(constants.currentStudentRole);
     }
 
@@ -200,7 +178,7 @@ export async function roleMeCommand(
       // this is a recognized role
       if (rolesToBeAssigned.includes(messageElementUpper)) {
         currentlyReadingName = false;
-        let roleToBeAdded = findRoleByName(messageElementUpper, client)!;
+        let roleToBeAdded: Role = roleNamesToRoles.get(messageElementUpper)!;
 
         // role is recognized as a role to be assigned and member does not have it
         if (!roleIsInMemberCache(interaction.member, messageElementUpper)) {
@@ -230,7 +208,7 @@ export async function roleMeCommand(
     }
 
     addRolesToMember(interaction.member, rolesToBeAdded);
-    console.log(`Roles ${roleNamesAdded} added to ${authorUsername}`);
+    console.log(`Adding roles [${roleNamesAdded}] to ${authorUsername}`);
 
     personName = personName.slice(0, -1);
     if (unchangableNameMemberList.includes(authorUsername)) {

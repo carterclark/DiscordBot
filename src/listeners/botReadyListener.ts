@@ -1,5 +1,6 @@
+import { Role } from "discord.js";
 import { findChannelByName } from "../actions/channelActions";
-import { updateRolesToBeAssigned } from "../actions/roleActions";
+import { syncRolesToBeAssigned } from "../actions/roleActions";
 import { updateUnchangableNameMemberList } from "../actions/userActions";
 
 const constants = require("../constants/constants.json");
@@ -9,7 +10,7 @@ dotenv.config();
 export function ready(
   client: any,
   unchangableNameMemberList: string[],
-  rolesToBeAssigned: string[],
+  roleNamesToRoles: Map<string, Role>,
   classPrefixList: string[]
 ): void {
   client.on("ready", async () => {
@@ -18,9 +19,10 @@ export function ready(
     }
 
     updateUnchangableNameMemberList(client, unchangableNameMemberList);
-    updateRolesToBeAssigned(client, rolesToBeAssigned, classPrefixList);
+    syncRolesToBeAssigned(client, roleNamesToRoles, classPrefixList);
 
     const server = client.guilds.cache.get(String(process.env.SERVER_ID));
+    const rolesToBeAssigned: String[] = Array.from(roleNamesToRoles.keys());
     const logString: string =
       `${client.user.username} initialized on server: ${
         server!.name

@@ -1,6 +1,6 @@
 import { secretChannelResponses } from "../actions/channelActions";
 import { roleMeCommand } from "../actions/roleActions";
-import { Client } from "discord.js";
+import { Client, Role } from "discord.js";
 
 const constants = require("../constants/constants.json");
 
@@ -8,7 +8,7 @@ export function interactionCreate(
   client: Client,
   unchangableNameMemberList: string[],
   isTakeRolesOn: { value: boolean },
-  rolesToBeAssigned: string[],
+  roleNamesToRoles: Map<string, Role>,
   classPrefixList: string[]
 ): void {
   client.on(`interactionCreate`, async (interaction: any) => {
@@ -27,7 +27,7 @@ export function interactionCreate(
         authorUsername,
         client,
         unchangableNameMemberList,
-        rolesToBeAssigned,
+        roleNamesToRoles,
         classPrefixList
       );
     } else if (channelName === constants.secretChannelName) {
@@ -43,7 +43,7 @@ export function interactionCreate(
         isTakeRolesOn,
         client,
         unchangableNameMemberList,
-        rolesToBeAssigned,
+        roleNamesToRoles,
         classPrefixList,
         authorUsername
       );

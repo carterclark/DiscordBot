@@ -7,7 +7,9 @@ export function hasClassPrefix(
   let prefix = "";
 
   for (const text of textArray) {
+    // there is a dash or a space or a number then break the loop
     if (text === "-" || text === " " || !isNaN(Number(text))) {
+      console.log(`prefix: ${prefix}`);
       break;
     }
     prefix += text.toUpperCase();

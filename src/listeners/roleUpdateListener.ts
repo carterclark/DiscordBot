@@ -1,12 +1,12 @@
 import { Role } from "discord.js";
-import { updateRolesToBeAssigned } from "../actions/roleActions";
+import { syncRolesToBeAssigned } from "../actions/roleActions";
 
 export function roleUpdate(
   client: any,
-  rolesToBeAssigned: string[],
+  roleNamesToRoles: Map<string, Role>,
   classPrefixList: string[]
 ): void {
-  client.on("roleUpdate", (role: Role) => {
-    updateRolesToBeAssigned(client, rolesToBeAssigned, classPrefixList);
+  client.on("roleUpdate", () => {
+    syncRolesToBeAssigned(client, roleNamesToRoles, classPrefixList);
   });
 }

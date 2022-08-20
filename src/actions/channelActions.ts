@@ -1,6 +1,6 @@
-import { CommandInteraction, Client } from "discord.js";
+import { CommandInteraction, Client, Role } from "discord.js";
 import {
-  updateRolesToBeAssigned,
+  syncRolesToBeAssigned,
   takeRoles,
   fetchListOfRolesSorted,
   roleMeCommand,
@@ -33,7 +33,7 @@ export async function secretChannelResponses(
   isTakeRolesOn: { value: boolean },
   client: Client,
   unchangableNameMemberList: string[],
-  rolesToBeAssigned: string[],
+  roleNamesToRoles: Map<string, Role>,
   classPrefixList: string[],
   authorUsername: string
 ) {
@@ -55,8 +55,8 @@ export async function secretChannelResponses(
     case `take_roles`: {
       if (isTakeRolesOn.value) {
         updateUnchangableNameMemberList(client, unchangableNameMemberList);
-        updateRolesToBeAssigned(client, rolesToBeAssigned, classPrefixList);
-        takeRoles(interaction, rolesToBeAssigned);
+        syncRolesToBeAssigned(client, roleNamesToRoles, classPrefixList);
+        takeRoles(interaction, roleNamesToRoles);
       } else {
         await interaction.reply(`take_roles is currently disabled`);
       }
@@ -91,7 +91,7 @@ export async function secretChannelResponses(
         authorUsername,
         client,
         unchangableNameMemberList,
-        rolesToBeAssigned,
+        roleNamesToRoles,
         classPrefixList
       );
     }

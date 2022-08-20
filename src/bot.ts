@@ -2,12 +2,12 @@ import { interactionCreate } from "./listeners/interactionCreateListener";
 import { ready } from "./listeners/botReadyListener";
 import { roleUpdate } from "./listeners/roleUpdateListener";
 import { uncaughtException } from "./listeners/uncaughtExceptionListener";
-import { Client, Intents } from "discord.js";
+import { Client, Intents, Role } from "discord.js";
 
 const dotenv = require("dotenv");
 dotenv.config();
 
-let rolesToBeAssigned: string[] = [];
+let roleNamesToRoles: Map<string, Role> = new Map();
 let unchangableNameMemberList: string[] = [];
 let classPrefixList: string[] = [];
 let isTakeRolesOn = { value: false };
@@ -22,13 +22,13 @@ const client = new Client({
 });
 
 uncaughtException(process, client);
-ready(client, unchangableNameMemberList, rolesToBeAssigned, classPrefixList);
-roleUpdate(client, rolesToBeAssigned, classPrefixList);
+ready(client, unchangableNameMemberList, roleNamesToRoles, classPrefixList);
+roleUpdate(client, roleNamesToRoles, classPrefixList);
 interactionCreate(
   client,
   unchangableNameMemberList,
   isTakeRolesOn,
-  rolesToBeAssigned,
+  roleNamesToRoles,
   classPrefixList
 );
 
