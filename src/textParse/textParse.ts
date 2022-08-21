@@ -9,7 +9,6 @@ export function hasClassPrefix(
   for (const text of textArray) {
     // there is a dash or a space or a number then break the loop
     if (text === "-" || text === " " || !isNaN(Number(text))) {
-      console.log(`prefix: ${prefix}`);
       break;
     }
     prefix += text.toUpperCase();
@@ -36,4 +35,33 @@ export function insertionSort(inputArr: any[]) {
     inputArr[j + 1] = current;
   }
   return [inputArr];
+}
+
+//example: Carter ics 140, ics-141
+export function getArrayOfRoles(
+  message: string,
+  classPrefixList: string[],
+  rolesToBeAssigned: String[]
+): string[] {
+  let arrayWithClasses: string[] = message.split(" ");
+  let arrayOfRoles: string[] = [];
+  // first get rid of everything untill the first class prefix
+  for (const messageElement of arrayWithClasses) {
+    if (hasClassPrefix(messageElement, classPrefixList)) {
+      break;
+    }
+    arrayWithClasses.shift();
+  }
+
+  for (const messageElement of arrayWithClasses) {
+    // element is a recognized class role
+    if (rolesToBeAssigned.includes(messageElement)) {
+      arrayOfRoles.push(messageElement);
+    }
+    // has a class prefix
+    else if (classPrefixList.includes(messageElement)) {
+    }
+  }
+
+  return arrayOfRoles;
 }

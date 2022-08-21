@@ -144,21 +144,18 @@ export async function roleMeCommand(
 ) {
   const message = interaction.options.getString("input", true);
   const rolesToBeAssigned: String[] = Array.from(roleNamesToRoles.keys());
-  let splitMessage: string[] = message.split(",").join("").split(` `);
-  const firstElement = splitMessage.at(0)!;
+  let splitMessage: string[] = message.split(" ");
 
   // to insure the first element is the persons name and not a class
   if (
-    !rolesToBeAssigned.includes(firstElement) &&
-    !hasClassPrefix(firstElement, classPrefixList)
+    !rolesToBeAssigned.includes(splitMessage.at(0)!) &&
+    !hasClassPrefix(splitMessage.at(0)!, classPrefixList)
   ) {
     console.log(`\nrole_me call initiated for ${authorUsername}`);
-    syncUnchangableNameMemberList(client, unchangableNameMemberList);
     let personName = ``;
     let rolesToBeAdded: any[] = [];
     let roleNamesAdded: string[] = [];
     let rolesSkipped: any[] = [];
-    let currentlyReadingName = true;
 
     if (!roleIsInMemberCache(interaction.member, constants.personRole)) {
       rolesToBeAdded.push(roleNamesToRoles.get(constants.personRole));
@@ -172,12 +169,20 @@ export async function roleMeCommand(
       roleNamesAdded.push(constants.currentStudentRole);
     }
 
-    for (const messageElement of splitMessage) {
+    // extract everything before the first class prefix
+    extractNameFromMessage(splitMessage, classPrefixList, personName);
+
+    let splitMessageWithoutName = splitMessage.join("").split(",");
+
+    // go through and edit every class name without a dash
+    formatClassNames(splitMessageWithoutName);
+
+    //assign roles
+    for (const messageElement of splitMessageWithoutName) {
       const messageElementUpper = messageElement.toUpperCase();
 
       // this is a recognized role
       if (rolesToBeAssigned.includes(messageElementUpper)) {
-        currentlyReadingName = false;
         let roleToBeAdded: Role = roleNamesToRoles.get(messageElementUpper)!;
 
         // role is recognized as a role to be assigned and member does not have it
@@ -188,20 +193,14 @@ export async function roleMeCommand(
 
         // this is a recognized role but the member already has it
         else {
-          currentlyReadingName = false;
           rolesSkipped.push(messageElementUpper);
         }
       }
-      // not a recognized role but is a class prefix
+      // not a recognized role but has a class prefix
       else if (hasClassPrefix(messageElement, classPrefixList)) {
-        currentlyReadingName = false;
         rolesSkipped.push(messageElementUpper);
       }
-      // still reading name
-      else if (currentlyReadingName) {
-        personName += messageElement + ` `;
-      }
-      // element is after the name but not recongnized as a class
+      // element is not recognized with a class prefix
       else {
         rolesSkipped.push(messageElement);
       }
@@ -211,6 +210,8 @@ export async function roleMeCommand(
     console.log(`Adding roles [${roleNamesAdded}] to ${authorUsername}`);
 
     personName = personName.slice(0, -1);
+
+    syncUnchangableNameMemberList(client, unchangableNameMemberList);
     if (unchangableNameMemberList.includes(authorUsername)) {
       personName = `couldn't change nickname to "${personName}", role is above the bot`;
     } else {
@@ -227,5 +228,41 @@ export async function roleMeCommand(
     await interaction.reply(
       `message: ${message}\n\nIt appears the first element in your message is a class name. \nReminder, the format is ${constants.messageRoleFormat}`
     );
+  }
+}
+
+function extractNameFromMessage(
+  splitMessage: string[],
+  classPrefixList: string[],
+  personName: string
+) {
+  for (let index = 0; index < splitMessage.length; index++) {
+    if (hasClassPrefix(splitMessage[index], classPrefixList)) {
+      break;
+    }
+    personName += splitMessage.shift() + ` `;
+    index--;
+  }
+}
+
+function formatClassNames(splitMessageWithoutName: string[]) {
+  for (let index = 0; index < splitMessageWithoutName.length; index++) {
+    const messageElement = splitMessageWithoutName[index];
+
+    if (messageElement.includes("-")) continue;
+
+    let classNameEdit = ``;
+    let notReadingNumber = true;
+    for (const element of messageElement.split("")) {
+      if (notReadingNumber && !isNaN(Number(element))) {
+        //if it is a number
+        classNameEdit += `-`;
+        notReadingNumber = false;
+      }
+
+      classNameEdit += element;
+    }
+
+    splitMessageWithoutName[index] = classNameEdit;
   }
 }
