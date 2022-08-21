@@ -152,7 +152,7 @@ export async function roleMeCommand(
     !hasClassPrefix(splitMessage.at(0)!, classPrefixList)
   ) {
     console.log(`\nrole_me call initiated for ${authorUsername}`);
-    let personName = ``;
+    let nameFromMessage = { value: `` };
     let rolesToBeAdded: any[] = [];
     let roleNamesAdded: string[] = [];
     let rolesSkipped: any[] = [];
@@ -170,7 +170,8 @@ export async function roleMeCommand(
     }
 
     // extract everything before the first class prefix
-    extractNameFromMessage(splitMessage, classPrefixList, personName);
+    extractNameFromMessage(splitMessage, classPrefixList, nameFromMessage);
+    let personName = nameFromMessage.value;
 
     let splitMessageWithoutName = splitMessage.join("").split(",");
 
@@ -209,8 +210,6 @@ export async function roleMeCommand(
     addRolesToMember(interaction.member, rolesToBeAdded);
     console.log(`Adding roles [${roleNamesAdded}] to ${authorUsername}`);
 
-    personName = personName.slice(0, -1);
-
     syncUnchangableNameMemberList(client, unchangableNameMemberList);
     if (unchangableNameMemberList.includes(authorUsername)) {
       personName = `couldn't change nickname to "${personName}", role is above the bot`;
@@ -221,7 +220,7 @@ export async function roleMeCommand(
     await interaction.reply(
       `message: ${message}\n\n` +
         `username: ${authorUsername}` +
-        `\nnickname: "${personName}"\nroles added: [${roleNamesAdded}]` +
+        `\nnickname: ${personName}\nroles added: [${roleNamesAdded}]` +
         `\nroles skipped: [${rolesSkipped}]`
     );
   } else {
@@ -234,15 +233,18 @@ export async function roleMeCommand(
 function extractNameFromMessage(
   splitMessage: string[],
   classPrefixList: string[],
-  personName: string
+  nameFromMessage: { value: string }
 ) {
   for (let index = 0; index < splitMessage.length; index++) {
     if (hasClassPrefix(splitMessage[index], classPrefixList)) {
       break;
     }
-    personName += splitMessage.shift() + ` `;
+    nameFromMessage.value += splitMessage.shift() + ` `;
     index--;
   }
+
+  // remove extra space
+  nameFromMessage.value = nameFromMessage.value.slice(0, -1);
 }
 
 function formatClassNames(splitMessageWithoutName: string[]) {

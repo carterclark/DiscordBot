@@ -24,5 +24,6 @@ export function updateUnchangableNameMemberList(
 }
 
 export function setUserNickname(member: any, newNickname: string) {
+  // member.setNickname("");
   member.setNickname(newNickname);
 }
