@@ -1,4 +1,4 @@
-import { Role } from "discord.js";
+import { Client, Role } from "discord.js";
 import { findChannelByName } from "../actions/channelActions";
 import { syncRolesToBeAssigned } from "../actions/roleActions";
 import { updateUnchangableNameMemberList } from "../actions/userActions";
@@ -8,7 +8,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 export function ready(
-  client: any,
+  client: Client,
   unchangableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
   classPrefixList: string[]

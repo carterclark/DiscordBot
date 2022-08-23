@@ -1,30 +1,28 @@
-import { CommandInteraction, Client, Role } from "discord.js";
+import {
+  CommandInteraction,
+  Client,
+  Role,
+  GuildMember,
+  Guild,
+} from "discord.js";
 import {
   syncRolesToBeAssigned,
   takeRoles,
-  fetchListOfRolesSorted,
+  getRoleNamesSorted,
   roleMeCommand,
 } from "./roleActions";
 import { updateUnchangableNameMemberList } from "./userActions";
 
 const constants = require("../constants/constants.json");
 
-export function findChannelByName(channelName: String, client: any) {
-  let server: any = client.guilds.cache.get(String(process.env.SERVER_ID))!;
+export function findChannelByName(channelName: String, client: Client) {
+  let server: Guild = client.guilds.cache.get(String(process.env.SERVER_ID))!;
 
   let channelFound = server!.channels.cache.find(
     (channel: { name: String }) => channel.name === channelName
   );
 
-  return channelFound!;
-}
-
-export function findChannelById(channelId: string, client: any) {
-  let server: any = client.guilds.cache.get(String(process.env.SERVER_ID))!;
-
-  const channelFound = server.channels.cache.get(channelId);
-
-  return channelFound;
+  return channelFound as any;
 }
 
 export async function secretChannelResponses(
@@ -56,22 +54,20 @@ export async function secretChannelResponses(
 
     case `info`: {
       updateUnchangableNameMemberList(client, unchangableNameMemberList);
+      const statString = getStatString(roleNamesToRoles, interaction);
+
       await interaction.reply(
-        `Server name: ${interaction.guild!.name}\nServer id: ${
-          interaction!.guild!.id
-        }\n` +
-          `classPrefixList: [${classPrefixList}]\n` +
+        `classPrefixList: [${classPrefixList}]\n` +
           `topRoles: [${constants.topRoles}]\n` +
-          `unchangableNameMemberList(updated): [${unchangableNameMemberList}]`
+          `unchangableNameMemberList(updated): [${unchangableNameMemberList}]\n` +
+          `ROLE STATS\n${statString}`
       );
       break;
     }
     case `list_roles`: {
-      const roleString = fetchListOfRolesSorted(
-        interaction!.guild!.roles.cache
+      await interaction.reply(
+        `roles listed: ${getRoleNamesSorted(roleNamesToRoles)}`
       );
-
-      await interaction.reply(`roles listed: ${roleString}`);
       break;
     }
     case `role_me`: {
@@ -85,4 +81,43 @@ export async function secretChannelResponses(
       );
     }
   }
+}
+function getStatString(
+  roleNamesToRoles: Map<string, Role>,
+  interaction: CommandInteraction
+) {
+  let roleNameToMemberCount: Map<string, Number> = new Map();
+  let countableRoleNames: string[] = Array.from(roleNamesToRoles.keys());
+  let roleNames: Array<string> = [];
+  let totalCount = 0;
+  let currentIndividualRoleCount: number = 0;
+  interaction.guild!.members.cache.forEach((member: GuildMember) => {
+    member.roles.cache.forEach((role: Role) => {
+      if (
+        countableRoleNames.includes(role.name) &&
+        constants.personRole !== role.name &&
+        constants.currentStudentRole !== role.name
+      ) {
+        totalCount++;
+        roleNames = Array.from(roleNameToMemberCount.keys());
+        if (!roleNames.includes(role.name)) {
+          roleNameToMemberCount.set(role.name, 1);
+        } else {
+          currentIndividualRoleCount = roleNameToMemberCount
+            .get(role.name)!
+            .valueOf();
+          roleNameToMemberCount.set(role.name, ++currentIndividualRoleCount);
+        }
+      }
+    });
+  });
+
+  let statString = `Total: ${totalCount} roles assigned\n`;
+  roleNameToMemberCount.forEach((value, key) => {
+    statString += `${key}:  ${value.valueOf().toString()} = ${(
+      (value.valueOf() / totalCount) *
+      100
+    ).toString()}%\n`;
+  });
+  return statString;
 }

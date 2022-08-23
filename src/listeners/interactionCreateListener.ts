@@ -47,7 +47,7 @@ export function interactionCreate(
       );
     } else {
       await interaction.reply({
-        content: "Commands not enabled for this channel",
+        content: "This command not enabled for this channel",
         ephemeral: true,
       });
     }
