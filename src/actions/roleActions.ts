@@ -94,31 +94,6 @@ export function getRoleNamesSorted(roleNamesToRoles: Map<string, Role>) {
   return roleString;
 }
 
-function addToClassPrefixList(roleName: String, classPrefixList: String[]) {
-  let textArray = roleName.split("");
-  let prefix = "";
-
-  for (const text of textArray) {
-    if (text == "-" && !classPrefixList.includes(prefix)) {
-      classPrefixList.push(prefix);
-      console.log(`prefix [${prefix}] added to classPrefixList`);
-      break;
-    }
-
-    prefix += text;
-  }
-}
-
-function roleIsInMemberCache(
-  member: GuildMember,
-  roleToCheck: string
-): boolean {
-  const tempRole = member.roles.cache.find(
-    (role: { name: string }) => role.name === roleToCheck
-  );
-  return tempRole !== undefined;
-}
-
 export async function roleMeCommand(
   interaction: CommandInteraction,
   authorUsername: string,
@@ -201,6 +176,31 @@ export async function roleMeCommand(
       `\nnickname: ${personName}\nroles added: [${roleNamesAdded}]` +
       `\nroles skipped: [${rolesSkipped}]`
   );
+}
+
+function addToClassPrefixList(roleName: String, classPrefixList: String[]) {
+  let textArray = roleName.split("");
+  let prefix = "";
+
+  for (const text of textArray) {
+    if (text == "-" && !classPrefixList.includes(prefix)) {
+      classPrefixList.push(prefix);
+      console.log(`prefix [${prefix}] added to classPrefixList`);
+      break;
+    }
+
+    prefix += text;
+  }
+}
+
+function roleIsInMemberCache(
+  member: GuildMember,
+  roleToCheck: string
+): boolean {
+  const tempRole = member.roles.cache.find(
+    (role: { name: string }) => role.name === roleToCheck
+  );
+  return tempRole !== undefined;
 }
 
 function formatClassNames(splitMessageWithoutName: string[]) {
