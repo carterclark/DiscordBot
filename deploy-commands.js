@@ -10,9 +10,12 @@ const commands = [
     .setName("role_me")
     .setDescription("Roles the user based upon input")
     .addStringOption((option) =>
+      option.setName("name").setDescription("Enter your name").setRequired(true)
+    )
+    .addStringOption((option) =>
       option
-        .setName("input")
-        .setDescription("Enter name and classes")
+        .setName("classes")
+        .setDescription("Enter your classes")
         .setRequired(true)
     ),
   new SlashCommandBuilder()
@@ -22,14 +25,11 @@ const commands = [
     .setName("list_roles")
     .setDescription("Replies with a sorted list of roles in the server"),
   new SlashCommandBuilder()
-    .setName("enable_take_roles")
-    .setDescription("Turns take_roles on"),
-  new SlashCommandBuilder()
-    .setName("disable_take_roles")
-    .setDescription("Turns take_roles off"),
-  new SlashCommandBuilder()
     .setName("take_roles")
-    .setDescription("takes all class roles from everyone"),
+    .setDescription("takes all class roles from everyone")
+    .addStringOption((option) =>
+      option.setName("yes_or_no").setDescription("confirm").setRequired(true)
+    ),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: "9" }).setToken(process.env.BOT_AUTH_TOKEN);

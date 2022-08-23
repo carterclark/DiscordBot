@@ -42,23 +42,14 @@ export async function secretChannelResponses(
       await interaction.reply(`Pong!`);
       break;
 
-    case `enable_take_roles`:
-      isTakeRolesOn.value = true;
-      await interaction.reply(`Bot will take roles`);
-      break;
-
-    case `disable_take_roles`:
-      isTakeRolesOn.value = false;
-      await interaction.reply(`Bot will NOT take roles`);
-      break;
-
     case `take_roles`: {
-      if (isTakeRolesOn.value) {
+      const message = interaction.options.getString("yes_or_no", true);
+      if (message.toUpperCase() === `YES`) {
         updateUnchangableNameMemberList(client, unchangableNameMemberList);
         syncRolesToBeAssigned(client, roleNamesToRoles, classPrefixList);
         takeRoles(interaction, roleNamesToRoles);
       } else {
-        await interaction.reply(`take_roles is currently disabled`);
+        await interaction.reply(`roles not taken`);
       }
 
       break;
