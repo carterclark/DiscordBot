@@ -45,6 +45,15 @@ export function interactionCreate(
         classPrefixList,
         authorUsername
       );
+    } else if (interaction.isSelectMenu()) {
+      //Here is where the selection is listened for
+      let classString = "";
+      let name = interaction.options.getString('name')
+      await interaction.values.forEach(async (value: string) => {
+        classString += `${value} `;
+      });
+
+      await interaction.reply({ content: `Hello ${name}, you have been added to ${classString}` });
     } else {
       await interaction.reply({
         content: "This command not enabled for this channel",
