@@ -58,7 +58,7 @@ export async function secretChannelResponses(
     case `info`: {
       updateUnchangableNameMemberList(client, unchangableNameMemberList);
       await interaction.reply(
-        `Server name: ${interaction!.guild!.name}\nServer id: ${
+        `Server name: ${interaction.guild!.name}\nServer id: ${
           interaction!.guild!.id
         }\n` +
           `classPrefixList: [${classPrefixList}]\n` +
