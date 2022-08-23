@@ -7,7 +7,6 @@ const constants = require("../constants/constants.json");
 export function interactionCreate(
   client: Client,
   unchangableNameMemberList: string[],
-  isTakeRolesOn: { value: boolean },
   roleNamesToRoles: Map<string, Role>,
   classPrefixList: string[]
 ): void {
@@ -40,7 +39,6 @@ export function interactionCreate(
       secretChannelResponses(
         commandName,
         interaction,
-        isTakeRolesOn,
         client,
         unchangableNameMemberList,
         roleNamesToRoles,

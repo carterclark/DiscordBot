@@ -10,7 +10,6 @@ dotenv.config();
 let roleNamesToRoles: Map<string, Role> = new Map();
 let unchangableNameMemberList: string[] = [];
 let classPrefixList: string[] = [];
-let isTakeRolesOn = { value: false };
 
 const client = new Client({
   intents: [
@@ -27,7 +26,6 @@ roleUpdate(client, roleNamesToRoles, classPrefixList);
 interactionCreate(
   client,
   unchangableNameMemberList,
-  isTakeRolesOn,
   roleNamesToRoles,
   classPrefixList
 );

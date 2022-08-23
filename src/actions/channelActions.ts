@@ -30,7 +30,6 @@ export function findChannelById(channelId: string, client: any) {
 export async function secretChannelResponses(
   commandName: String,
   interaction: CommandInteraction,
-  isTakeRolesOn: { value: boolean },
   client: Client,
   unchangableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
@@ -62,7 +61,6 @@ export async function secretChannelResponses(
           interaction!.guild!.id
         }\n` +
           `classPrefixList: [${classPrefixList}]\n` +
-          `isTakeRolesOn: ${isTakeRolesOn.value}\n` +
           `topRoles: [${constants.topRoles}]\n` +
           `unchangableNameMemberList(updated): [${unchangableNameMemberList}]`
       );
