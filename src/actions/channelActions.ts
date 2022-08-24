@@ -121,12 +121,11 @@ function getStatString(
     `Total: ${totalClassRoleCount} class roles assigned to ` +
     `${totalCurrentStudentRoleCount} students\n`;
   sortedMap.forEach((value, key) => {
-    statString += `${key}:  ${value.valueOf().toString()} = ${(
-      (value.valueOf() / totalClassRoleCount) *
-      100
-    )
-      .toFixed(2)
-      .toString()}%\n`;
+    statString +=
+      `${key}:  ${value.valueOf().toString()}` +
+      ` = ${((value.valueOf() / totalClassRoleCount) * 100)
+        .toFixed(2)
+        .toString()}%\n`;
   });
   return statString;
 }

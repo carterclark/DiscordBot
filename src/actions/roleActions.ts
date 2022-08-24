@@ -1,5 +1,5 @@
 import { Client, CommandInteraction, GuildMember, Role } from "discord.js";
-import { hasClassPrefix, insertionSort } from "../textParse/textParse";
+import { hasClassPrefix, insertionSort } from "../util/textUtil";
 
 const constants = require("../constants/constants.json");
 
