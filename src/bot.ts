@@ -3,6 +3,7 @@ import { ready } from "./listeners/botReadyListener";
 import { roleUpdate } from "./listeners/roleUpdateListener";
 import { uncaughtException } from "./listeners/uncaughtExceptionListener";
 import { Client, Intents, Role } from "discord.js";
+import { messageCreate } from "./listeners/messageCreateListener";
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -29,5 +30,6 @@ interactionCreate(
   roleNamesToRoles,
   classPrefixList
 );
+messageCreate(client);
 
 client.login(process.env.BOT_AUTH_TOKEN);

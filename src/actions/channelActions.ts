@@ -10,6 +10,7 @@ import {
   takeRoles,
   getRoleNamesSorted,
   roleMeCommand,
+  roleIsInMemberCache,
 } from "./roleActions";
 import { updateUnchangableNameMemberList } from "./userActions";
 
@@ -93,7 +94,9 @@ function getStatString(
   let totalCurrentStudentRoleCount = 0;
   let currentIndividualRoleCount: number = 0;
   interaction.guild!.members.cache.forEach((member: GuildMember) => {
-    totalCurrentStudentRoleCount++;
+    if (roleIsInMemberCache(member, constants.currentStudentRole)) {
+      totalCurrentStudentRoleCount++;
+    }
     member.roles.cache.forEach((role: Role) => {
       if (
         countableRoleNames.includes(role.name) &&

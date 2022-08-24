@@ -193,7 +193,7 @@ function addToClassPrefixList(roleName: String, classPrefixList: String[]) {
   }
 }
 
-function roleIsInMemberCache(
+export function roleIsInMemberCache(
   member: GuildMember,
   roleToCheck: string
 ): boolean {
