@@ -89,16 +89,18 @@ function getStatString(
   let roleNameToMemberCount: Map<string, Number> = new Map();
   let countableRoleNames: string[] = Array.from(roleNamesToRoles.keys());
   let roleNames: Array<string> = [];
-  let totalCount = 0;
+  let totalClassRoleCount = 0;
+  let totalCurrentStudentRoleCount = 0;
   let currentIndividualRoleCount: number = 0;
   interaction.guild!.members.cache.forEach((member: GuildMember) => {
+    totalCurrentStudentRoleCount++;
     member.roles.cache.forEach((role: Role) => {
       if (
         countableRoleNames.includes(role.name) &&
         constants.personRole !== role.name &&
         constants.currentStudentRole !== role.name
       ) {
-        totalCount++;
+        totalClassRoleCount++;
         roleNames = Array.from(roleNameToMemberCount.keys());
         if (!roleNames.includes(role.name)) {
           roleNameToMemberCount.set(role.name, 1);
@@ -112,12 +114,16 @@ function getStatString(
     });
   });
 
-  let statString = `Total: ${totalCount} roles assigned\n`;
+  let statString =
+    `Total: ${totalClassRoleCount} class roles assigned to ` +
+    `${totalCurrentStudentRoleCount} students\n`;
   roleNameToMemberCount.forEach((value, key) => {
     statString += `${key}:  ${value.valueOf().toString()} = ${(
-      (value.valueOf() / totalCount) *
+      (value.valueOf() / totalClassRoleCount) *
       100
-    ).toString()}%\n`;
+    )
+      .toFixed(2)
+      .toString()}%\n`;
   });
   return statString;
 }
