@@ -26,6 +26,11 @@
 
 ## Workflow
 
+### function testing checklist
+
+1. role_me in authorization: carter ICS 140, ICS-141, ICS342, ICS 460, ics-141, data211, ics-140, ics 365
+2. take_roles, info, and class_list in secret-secret
+
 ### github
 
 1. git add .
