@@ -1,7 +1,7 @@
 import { Client, Role } from "discord.js";
 import { findChannelByName } from "../actions/channelActions";
 import { syncRolesToBeAssigned } from "../actions/roleActions";
-import { updateUnchangableNameMemberList } from "../actions/userActions";
+import { syncUnchangableNameMemberList } from "../actions/userActions";
 
 const constants = require("../constants/constants.json");
 const dotenv = require("dotenv");
@@ -18,7 +18,7 @@ export function ready(
       return;
     }
 
-    updateUnchangableNameMemberList(client, unchangableNameMemberList);
+    syncUnchangableNameMemberList(client, unchangableNameMemberList);
     syncRolesToBeAssigned(client, roleNamesToRoles, classPrefixList);
 
     const server = client.guilds.cache.get(String(process.env.SERVER_ID));

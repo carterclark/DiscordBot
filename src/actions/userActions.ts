@@ -2,7 +2,7 @@ import { Client, GuildMember } from "discord.js";
 
 const constants = require("../constants/constants.json");
 
-export function updateUnchangableNameMemberList(
+export function syncUnchangableNameMemberList(
   client: Client,
   unchangableNameMemberList: string[]
 ) {

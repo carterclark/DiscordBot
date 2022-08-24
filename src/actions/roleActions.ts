@@ -1,6 +1,5 @@
 import { Client, CommandInteraction, GuildMember, Role } from "discord.js";
 import { hasClassPrefix, insertionSort } from "../textParse/textParse";
-import { updateUnchangableNameMemberList as syncUnchangableNameMemberList } from "./userActions";
 
 const constants = require("../constants/constants.json");
 
@@ -160,8 +159,6 @@ export async function roleMeCommand(
 
   member.roles.add(rolesToBeAdded);
   console.log(`Adding roles [${roleNamesAdded}] to ${authorUsername}`);
-
-  syncUnchangableNameMemberList(client, unchangableNameMemberList);
 
   let personName = nameFromMessage;
   if (unchangableNameMemberList.includes(authorUsername)) {

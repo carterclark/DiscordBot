@@ -1,6 +1,7 @@
 import { secretChannelResponses } from "../actions/channelActions";
 import { roleMeCommand } from "../actions/roleActions";
 import { Client, Role } from "discord.js";
+import { syncUnchangableNameMemberList } from "../actions/userActions";
 
 const constants = require("../constants/constants.json");
 
@@ -16,6 +17,8 @@ export function interactionCreate(
     const { commandName } = interaction;
     const channelName = interaction.channel.name;
     const authorUsername = interaction.member.user.username;
+
+    syncUnchangableNameMemberList(client, unchangableNameMemberList);
 
     if (
       channelName === constants.authChannelName &&

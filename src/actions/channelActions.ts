@@ -12,7 +12,6 @@ import {
   roleMeCommand,
   roleIsInMemberCache,
 } from "./roleActions";
-import { updateUnchangableNameMemberList } from "./userActions";
 
 const constants = require("../constants/constants.json");
 
@@ -43,7 +42,6 @@ export async function secretChannelResponses(
     case `take_roles`: {
       const message = interaction.options.getString("yes_or_no", true);
       if (message.toUpperCase() === `YES`) {
-        updateUnchangableNameMemberList(client, unchangableNameMemberList);
         syncRolesToBeAssigned(client, roleNamesToRoles, classPrefixList);
         takeRoles(interaction, roleNamesToRoles);
       } else {
@@ -54,7 +52,6 @@ export async function secretChannelResponses(
     }
 
     case `info`: {
-      updateUnchangableNameMemberList(client, unchangableNameMemberList);
       const statString = getStatString(roleNamesToRoles, interaction);
 
       await interaction.reply(
@@ -87,7 +84,7 @@ function getStatString(
   roleNamesToRoles: Map<string, Role>,
   interaction: CommandInteraction
 ) {
-  let roleNameToMemberCount: Map<string, Number> = new Map();
+  let roleNameToMemberCount: Map<string, number> = new Map();
   let countableRoleNames: string[] = Array.from(roleNamesToRoles.keys());
   let roleNames: Array<string> = [];
   let totalClassRoleCount = 0;
@@ -117,10 +114,13 @@ function getStatString(
     });
   });
 
+  const sortedMap = new Map(
+    [...roleNameToMemberCount.entries()].sort((a, b) => b[1] - a[1])
+  );
   let statString =
     `Total: ${totalClassRoleCount} class roles assigned to ` +
     `${totalCurrentStudentRoleCount} students\n`;
-  roleNameToMemberCount.forEach((value, key) => {
+  sortedMap.forEach((value, key) => {
     statString += `${key}:  ${value.valueOf().toString()} = ${(
       (value.valueOf() / totalClassRoleCount) *
       100
