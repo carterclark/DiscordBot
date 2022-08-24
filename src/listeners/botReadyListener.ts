@@ -11,7 +11,8 @@ export function ready(
   client: Client,
   unchangableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
-  classPrefixList: string[]
+  classPrefixList: string[],
+  restrictedMentionIdToRoles: Map<string, Role>
 ): void {
   client.on("ready", async () => {
     if (!client.user || !client.application) {
@@ -20,6 +21,7 @@ export function ready(
 
     syncUnchangableNameMemberList(client, unchangableNameMemberList);
     syncRolesToBeAssigned(client, roleNamesToRoles, classPrefixList);
+    fetchRestrictedMentions(client, restrictedMentionIdToRoles);
 
     const server = client.guilds.cache.get(String(process.env.SERVER_ID));
     const rolesToBeAssigned: String[] = Array.from(roleNamesToRoles.keys());
@@ -35,5 +37,19 @@ export function ready(
       client
     );
     logChannel.send(logString);
+  });
+}
+
+function fetchRestrictedMentions(
+  client: Client,
+  restrictedMentionNameToRoles: Map<string, Role>
+) {
+  const server = client.guilds.cache.get(String(process.env.SERVER_ID));
+  const rolesToBeRestricted: String[] = constants.restrictedRoleNames;
+
+  server?.roles.cache.forEach((role: Role) => {
+    if (rolesToBeRestricted.includes(role.name)) {
+      restrictedMentionNameToRoles.set(role.id, role);
+    }
   });
 }

@@ -11,6 +11,7 @@ dotenv.config();
 let roleNamesToRoles: Map<string, Role> = new Map();
 let unchangableNameMemberList: string[] = [];
 let classPrefixList: string[] = [];
+let restrictedMentionIdToRoles: Map<string, Role> = new Map();
 
 const client = new Client({
   intents: [
@@ -22,7 +23,13 @@ const client = new Client({
 });
 
 uncaughtException(process, client);
-ready(client, unchangableNameMemberList, roleNamesToRoles, classPrefixList);
+ready(
+  client,
+  unchangableNameMemberList,
+  roleNamesToRoles,
+  classPrefixList,
+  restrictedMentionIdToRoles
+);
 roleUpdate(client, roleNamesToRoles, classPrefixList);
 interactionCreate(
   client,
@@ -30,6 +37,6 @@ interactionCreate(
   roleNamesToRoles,
   classPrefixList
 );
-messageCreate(client);
+messageCreate(client, restrictedMentionIdToRoles, unchangableNameMemberList);
 
 client.login(process.env.BOT_AUTH_TOKEN);

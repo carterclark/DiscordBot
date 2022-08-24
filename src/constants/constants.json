@@ -16,5 +16,6 @@
   "secretChannelName": "secret-secret",
   "botLogChannelName": "bot-logs",
   "messageRoleFormat": "'/role_me [YOUR NAME] [CLASS-1], [CLASS-2], ...'",
-  "roleMeCommand": "role_me"
+  "roleMeCommand": "role_me",
+  "restrictedRoleNames": ["Current_Student", "Person", "@everyone"]
 }
