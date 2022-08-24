@@ -1,4 +1,4 @@
-import { Client, Message, Role, TextBasedChannel } from "discord.js";
+import { Client } from "discord.js";
 
 const constants = require("../constants/constants.json");
 
