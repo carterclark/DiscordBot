@@ -86,40 +86,33 @@ function getStatString(
 ) {
   let roleNameToMemberCount: Map<string, number> = new Map();
   let countableRoleNames: string[] = Array.from(roleNamesToRoles.keys());
-  let roleNames: Array<string> = [];
   let totalClassRoleCount = 0;
   let totalCurrentStudentRoleCount = 0;
-  let currentIndividualRoleCount: number = 0;
-  interaction.guild!.members.cache.forEach((member: GuildMember) => {
-    if (roleIsInMemberCache(member, constants.currentStudentRole)) {
-      totalCurrentStudentRoleCount++;
+
+  interaction.guild?.roles.cache.forEach((role: Role) => {
+    if (
+      role.members.size > 0 &&
+      countableRoleNames.includes(role.name) &&
+      constants.personRole !== role.name &&
+      constants.currentStudentRole !== role.name
+    ) {
+      totalClassRoleCount += role.members.size;
+      roleNameToMemberCount.set(role.name, role.members.size);
     }
-    member.roles.cache.forEach((role: Role) => {
-      if (
-        countableRoleNames.includes(role.name) &&
-        constants.personRole !== role.name &&
-        constants.currentStudentRole !== role.name
-      ) {
-        totalClassRoleCount++;
-        roleNames = Array.from(roleNameToMemberCount.keys());
-        if (!roleNames.includes(role.name)) {
-          roleNameToMemberCount.set(role.name, 1);
-        } else {
-          currentIndividualRoleCount = roleNameToMemberCount
-            .get(role.name)!
-            .valueOf();
-          roleNameToMemberCount.set(role.name, ++currentIndividualRoleCount);
-        }
-      }
-    });
   });
+
+  totalCurrentStudentRoleCount = interaction.guild?.roles.cache.find(
+    (role: Role) => role.name === constants.currentStudentRole
+  )?.members.size!;
+
+  let statString =
+    `Total: ${totalClassRoleCount} class roles assigned to ` +
+    `${totalCurrentStudentRoleCount} students\n`;
 
   const sortedMap = new Map(
     [...roleNameToMemberCount.entries()].sort((a, b) => b[1] - a[1])
   );
-  let statString =
-    `Total: ${totalClassRoleCount} class roles assigned to ` +
-    `${totalCurrentStudentRoleCount} students\n`;
+
   sortedMap.forEach((value, key) => {
     statString +=
       `${key}:  ${value.valueOf().toString()}` +
