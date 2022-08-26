@@ -31,7 +31,7 @@ export function messageCreate(
       message.content.startsWith(`/role_me`)
     ) {
       return message.reply(
-        `You need to type out role_me and then select ` +
+        `You need to type out /role_me and then select ` +
           `the role_me command before typing the rest of your message`
       );
     }
