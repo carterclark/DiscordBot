@@ -117,7 +117,7 @@ function getStatString(
     statString +=
       `${key}:  ${value.valueOf().toString()}` +
       ` = ${((value.valueOf() / totalClassRoleCount) * 100)
-        .toFixed(2)
+        .toFixed(1)
         .toString()}%\n`;
   });
   return statString;
