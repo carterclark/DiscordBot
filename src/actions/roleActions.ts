@@ -169,7 +169,7 @@ export async function roleMeCommand(
 
   await interaction.reply(
     `/role_me ${nameFromMessage} ${classes}\n\n` +
-      `username: ${authorUsername}` +
+      `user: ${member}` +
       `\nnickname: ${personName}\nroles added: [${roleNamesAdded}]` +
       `\nroles skipped: [${rolesSkipped}]`
   );
