@@ -1,22 +1,15 @@
-import {
-  CommandInteraction,
-  Client,
-  Role,
-  GuildMember,
-  Guild,
-} from "discord.js";
+import { CommandInteraction, Client, Role, Guild, Channel } from "discord.js";
 import {
   syncRolesToBeAssigned,
   takeRoles,
   getRoleNamesSorted,
   roleMeCommand,
-  roleIsInMemberCache,
 } from "./roleActions";
 
 const constants = require("../constants/constants.json");
 
 export function findChannelByName(channelName: String, client: Client) {
-  let server: Guild = client.guilds.cache.get(String(process.env.SERVER_ID))!;
+  const server: Guild = client.guilds.cache.get(String(process.env.SERVER_ID))!;
 
   let channelFound = server!.channels.cache.find(
     (channel: { name: String }) => channel.name === channelName
@@ -25,12 +18,25 @@ export function findChannelByName(channelName: String, client: Client) {
   return channelFound as any;
 }
 
+export function syncChannelNameToChannels(
+  server: Guild,
+  channelNamesToChannels: Map<String, Channel>
+) {
+  const channelNameList = Array.from(channelNamesToChannels.keys());
+  server.channels.cache.forEach((channel: any) => {
+    if (!channelNameList.includes(channel.name)) {
+      channelNamesToChannels.set(channel.name, channel);
+    }
+  });
+}
+
 export async function secretChannelResponses(
   commandName: String,
   interaction: CommandInteraction,
-  client: Client,
+  server: Guild,
   unchangableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
+  rolesToBeAssigned: string[],
   classPrefixList: string[],
   authorUsername: string
 ) {
@@ -42,8 +48,13 @@ export async function secretChannelResponses(
     case `take_roles`: {
       const message = interaction.options.getString("yes_or_no", true);
       if (message.toUpperCase() === `YES`) {
-        syncRolesToBeAssigned(client, roleNamesToRoles, classPrefixList);
-        takeRoles(interaction, roleNamesToRoles);
+        syncRolesToBeAssigned(
+          server,
+          roleNamesToRoles,
+          rolesToBeAssigned,
+          classPrefixList
+        );
+        takeRoles(interaction, rolesToBeAssigned);
       } else {
         await interaction.reply(`roles not taken`);
       }
@@ -52,7 +63,7 @@ export async function secretChannelResponses(
     }
 
     case `info`: {
-      const statString = getStatString(roleNamesToRoles, interaction);
+      const statString = getStatString(rolesToBeAssigned, interaction);
 
       await interaction.reply(
         `classPrefixList: [${classPrefixList}]\n` +
@@ -72,27 +83,26 @@ export async function secretChannelResponses(
       roleMeCommand(
         interaction,
         authorUsername,
-        client,
         unchangableNameMemberList,
         roleNamesToRoles,
+        rolesToBeAssigned,
         classPrefixList
       );
     }
   }
 }
 function getStatString(
-  roleNamesToRoles: Map<string, Role>,
+  rolesToBeAssigned: string[],
   interaction: CommandInteraction
 ) {
   let roleNameToMemberCount: Map<string, number> = new Map();
-  let countableRoleNames: string[] = Array.from(roleNamesToRoles.keys());
   let totalClassRoleCount = 0;
   let totalCurrentStudentRoleCount = 0;
 
   interaction.guild?.roles.cache.forEach((role: Role) => {
     if (
       role.members.size > 0 &&
-      countableRoleNames.includes(role.name) &&
+      rolesToBeAssigned.includes(role.name) &&
       constants.personRole !== role.name &&
       constants.currentStudentRole !== role.name
     ) {

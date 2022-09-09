@@ -1,18 +1,17 @@
-import { Client, CommandInteraction, GuildMember, Role } from "discord.js";
+import { CommandInteraction, Guild, GuildMember, Role } from "discord.js";
 import { hasClassPrefix, insertionSort } from "../util/textUtil";
 
 const constants = require("../constants/constants.json");
 
 export async function takeRoles(
   interaction: CommandInteraction,
-  roleNamesToRoles: Map<string, Role>
+  rolesToBeAssigned: string[]
 ) {
   let classRoleTakenCount = 0;
   let userWithRoleTakenCount = 0;
   let userNotCounted: boolean;
   let rolesToBeRemoved: Role[] = [];
   let rolesRemovedNames: string[] = [];
-  const rolesToBeAssigned: String[] = Array.from(roleNamesToRoles.keys());
 
   interaction.guild!.members.cache.forEach((member: GuildMember) => {
     userNotCounted = true;
@@ -49,22 +48,27 @@ export async function takeRoles(
 }
 
 export function syncRolesToBeAssigned(
-  client: Client,
+  server: Guild,
   roleNamesToRoles: Map<string, Role>,
+  rolesToBeAssigned: string[],
   classPrefixList: String[]
 ) {
-  const server = client.guilds.cache.get(String(process.env.SERVER_ID));
-  const rolesToBeAssigned: String[] = Array.from(roleNamesToRoles.keys());
+  const rolesInMap: String[] = Array.from(roleNamesToRoles.keys());
 
   server!.roles.cache.forEach((role: Role) => {
     const roleName = role.name;
+
+    if (!rolesInMap.includes(roleName)) {
+      roleNamesToRoles.set(roleName, role);
+    }
+
     if (
       !constants.topRoles.includes(roleName) &&
       !rolesToBeAssigned.includes(roleName) &&
       constants.everyoneRole !== roleName &&
       constants.newRoleName !== roleName
     ) {
-      roleNamesToRoles.set(roleName, role);
+      rolesToBeAssigned.push(roleName);
       console.log(`role [${roleName}] added to roleNamesToRoles list`);
       addToClassPrefixList(roleName, classPrefixList);
     }
@@ -96,17 +100,16 @@ export function getRoleNamesSorted(roleNamesToRoles: Map<string, Role>) {
 export async function roleMeCommand(
   interaction: CommandInteraction,
   authorUsername: string,
-  client: Client,
   unchangableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
+  rolesToBeAssigned: string[],
   classPrefixList: string[]
 ) {
   const classes = interaction.options.getString("classes", true);
   const member = interaction.member as GuildMember;
   const nameFromMessage = interaction.options.getString("name", true);
-  const rolesToBeAssigned: String[] = Array.from(roleNamesToRoles.keys());
 
-  let splitMessage: string[] = classes.split(" ");
+  let splitMessageSpaceSeperated: string[] = classes.split(" ");
 
   console.log(`\nrole_me call initiated for ${authorUsername}`);
   let rolesToBeAdded: Role[] = [];
@@ -123,13 +126,15 @@ export async function roleMeCommand(
     roleNamesAdded.push(constants.currentStudentRole);
   }
 
-  let splitMessageWithoutName = splitMessage.join("").split(",");
+  let splitMessageCommaSeperated = splitMessageSpaceSeperated
+    .join("")
+    .split(",");
 
   // go through and edit every class name without a dash
-  formatClassNames(splitMessageWithoutName);
+  formatClassNames(splitMessageCommaSeperated);
 
   //assign roles
-  for (const messageElement of splitMessageWithoutName) {
+  for (const messageElement of splitMessageCommaSeperated) {
     const messageElementUpper = messageElement.toUpperCase();
 
     // this is a recognized role
@@ -207,12 +212,12 @@ function formatClassNames(splitMessageWithoutName: string[]) {
     if (messageElement.includes("-")) continue;
 
     let classNameEdit = ``;
-    let notReadingNumber = true;
+    let readingNumber = false;
     for (const element of messageElement.split("")) {
-      if (notReadingNumber && !isNaN(Number(element))) {
+      if (!readingNumber && !isNaN(Number(element))) {
         //if it is a number
         classNameEdit += `-`;
-        notReadingNumber = false;
+        readingNumber = true;
       }
 
       classNameEdit += element;

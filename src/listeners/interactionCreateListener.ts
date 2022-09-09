@@ -1,6 +1,6 @@
 import { secretChannelResponses } from "../actions/channelActions";
 import { roleMeCommand } from "../actions/roleActions";
-import { Client, Role } from "discord.js";
+import { Client, Guild, Interaction, Role } from "discord.js";
 import { syncUnchangableNameMemberList } from "../actions/userActions";
 
 const constants = require("../constants/constants.json");
@@ -9,6 +9,7 @@ export function interactionCreate(
   client: Client,
   unchangableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
+  rolesToBeAssigned: string[],
   classPrefixList: string[]
 ): void {
   client.on(`interactionCreate`, async (interaction: any) => {
@@ -17,8 +18,9 @@ export function interactionCreate(
     const { commandName } = interaction;
     const channelName = interaction.channel.name;
     const authorUsername = interaction.member.user.username;
+    const server: Guild = interaction.guild!;
 
-    syncUnchangableNameMemberList(client, unchangableNameMemberList);
+    syncUnchangableNameMemberList(server, unchangableNameMemberList);
 
     if (
       channelName === constants.authChannelName &&
@@ -27,9 +29,9 @@ export function interactionCreate(
       roleMeCommand(
         interaction,
         authorUsername,
-        client,
         unchangableNameMemberList,
         roleNamesToRoles,
+        rolesToBeAssigned,
         classPrefixList
       );
     } else if (channelName === constants.secretChannelName) {
@@ -42,9 +44,10 @@ export function interactionCreate(
       secretChannelResponses(
         commandName,
         interaction,
-        client,
+        server,
         unchangableNameMemberList,
         roleNamesToRoles,
+        rolesToBeAssigned,
         classPrefixList,
         authorUsername
       );

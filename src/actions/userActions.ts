@@ -1,24 +1,18 @@
-import { Client, GuildMember } from "discord.js";
+import { Guild, GuildMember, Role } from "discord.js";
 
 const constants = require("../constants/constants.json");
 
 export function syncUnchangableNameMemberList(
-  client: Client,
+  server: Guild,
   unchangableNameMemberList: string[]
 ) {
-  const server = client.guilds.cache.get(String(process.env.SERVER_ID));
-  let roleName = ``;
-  server!.members.cache.forEach((member: GuildMember) => {
-    for (const roleId of member.roles.cache) {
-      roleName = server!.roles.cache.get(String(roleId.at(0)))!.name;
-
-      if (
-        constants.topRoles.includes(roleName) &&
-        !unchangableNameMemberList.includes(member.user.username)
-      ) {
-        unchangableNameMemberList.push(member.user.username);
-        continue;
-      }
+  server?.roles.cache.forEach((role: Role) => {
+    if (constants.topRoles.includes(role.name)) {
+      role.members.forEach((member: GuildMember) => {
+        if (!unchangableNameMemberList.includes(member.user.username)) {
+          unchangableNameMemberList.push(member.user.username);
+        }
+      });
     }
   });
 }

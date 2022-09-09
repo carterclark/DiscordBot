@@ -1,5 +1,6 @@
-import { Client, Role } from "discord.js";
-import { findChannelByName } from "../actions/channelActions";
+import { Channel, Client, Guild, Role } from "discord.js";
+import { schedule } from "node-cron";
+import { syncChannelNameToChannels } from "../actions/channelActions";
 import { syncRolesToBeAssigned } from "../actions/roleActions";
 import { syncUnchangableNameMemberList } from "../actions/userActions";
 
@@ -11,20 +12,28 @@ export function ready(
   client: Client,
   unchangableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
+  rolesToBeAssigned: string[],
   classPrefixList: string[],
-  restrictedMentionIdToRoles: Map<string, Role>
+  restrictedMentionIdToRoles: Map<string, Role>,
+  channelNamesToChannels: Map<String, Channel>
 ): void {
   client.on("ready", async () => {
     if (!client.user || !client.application) {
       return;
     }
 
-    syncUnchangableNameMemberList(client, unchangableNameMemberList);
-    syncRolesToBeAssigned(client, roleNamesToRoles, classPrefixList);
-    fetchRestrictedMentions(client, restrictedMentionIdToRoles);
+    const server = client.guilds.cache.get(String(process.env.SERVER_ID))!;
 
-    const server = client.guilds.cache.get(String(process.env.SERVER_ID));
-    const rolesToBeAssigned: String[] = Array.from(roleNamesToRoles.keys());
+    syncUnchangableNameMemberList(server, unchangableNameMemberList);
+    syncRolesToBeAssigned(
+      server,
+      roleNamesToRoles,
+      rolesToBeAssigned,
+      classPrefixList
+    );
+    syncChannelNameToChannels(server, channelNamesToChannels);
+    fetchRestrictedMentions(server, restrictedMentionIdToRoles);
+
     const logString: string =
       `${client.user.username} initialized on server: ${
         server!.name
@@ -32,19 +41,48 @@ export function ready(
       `\nrolesToBeAssigned: [${rolesToBeAssigned}]`;
 
     console.log(logString);
-    const logChannel: any = findChannelByName(
-      constants.botLogChannelName,
-      client
+    const logChannel: any = channelNamesToChannels.get(
+      constants.botLogChannelName
     );
     logChannel.send(logString);
   });
+
+  const springCron = `0 0 18 10 1 * *`; //Spring: January 10th
+  const summerCron = `0 0 18 14 5 * *`; //Summer: May 14th
+  const fallCron = `0 0 18 22 8 * *`; //Fall: Augest 22nd
+
+  setupScheduledMessage(channelNamesToChannels, springCron);
+  setupScheduledMessage(channelNamesToChannels, summerCron);
+  setupScheduledMessage(channelNamesToChannels, fallCron);
+}
+
+function setupScheduledMessage(
+  channelNamesToChannels: Map<String, Channel>,
+  cronString: string
+) {
+  schedule(
+    cronString,
+    function jobYouNeedToExecute() {
+      const announcementsChannel: any =
+        channelNamesToChannels.get(`announcements`);
+
+      announcementsChannel.send(
+        `@everyone Hey guys, this is you're once in a ` +
+          `semester reminder to please plug the discord in ` +
+          `your classes. We'd appreciate it. 🙏` +
+          `\n\nSomething that the mods have done in the past is just pasting the link in the zoom chat.`
+      );
+    },
+    {
+      timezone: "America/Mexico_City",
+    }
+  );
 }
 
 function fetchRestrictedMentions(
-  client: Client,
+  server: Guild,
   restrictedMentionNameToRoles: Map<string, Role>
 ) {
-  const server = client.guilds.cache.get(String(process.env.SERVER_ID));
   const rolesToBeRestricted: String[] = constants.restrictedRoleNames;
 
   server?.roles.cache.forEach((role: Role) => {

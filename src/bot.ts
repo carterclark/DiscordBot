@@ -2,16 +2,18 @@ import { interactionCreate } from "./listeners/interactionCreateListener";
 import { ready } from "./listeners/botReadyListener";
 import { roleUpdate } from "./listeners/roleUpdateListener";
 import { uncaughtException } from "./listeners/uncaughtExceptionListener";
-import { Client, Intents, Role } from "discord.js";
+import { Channel, Client, Intents, Role } from "discord.js";
 import { messageCreate } from "./listeners/messageCreateListener";
 
 const dotenv = require("dotenv");
 dotenv.config();
 
 let roleNamesToRoles: Map<string, Role> = new Map();
+let rolesToBeAssigned: string[] = [];
 let unchangableNameMemberList: string[] = [];
 let classPrefixList: string[] = [];
 let restrictedMentionIdToRoles: Map<string, Role> = new Map();
+let channelNamesToChannels: Map<String, Channel> = new Map();
 
 const client = new Client({
   intents: [
@@ -22,21 +24,24 @@ const client = new Client({
   ],
 });
 
-uncaughtException(process, client);
 ready(
   client,
   unchangableNameMemberList,
   roleNamesToRoles,
+  rolesToBeAssigned,
   classPrefixList,
-  restrictedMentionIdToRoles
+  restrictedMentionIdToRoles,
+  channelNamesToChannels
 );
-roleUpdate(client, roleNamesToRoles, classPrefixList);
+roleUpdate(client, roleNamesToRoles, rolesToBeAssigned, classPrefixList);
 interactionCreate(
   client,
   unchangableNameMemberList,
   roleNamesToRoles,
+  rolesToBeAssigned,
   classPrefixList
 );
 messageCreate(client, restrictedMentionIdToRoles, unchangableNameMemberList);
 
+uncaughtException(process, client);
 client.login(process.env.BOT_AUTH_TOKEN);
