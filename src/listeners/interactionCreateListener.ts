@@ -1,7 +1,7 @@
-import { secretChannelResponses } from "../actions/channelActions";
-import { roleMeCommand } from "../actions/roleActions";
-import { Client, Guild, Interaction, Role } from "discord.js";
-import { syncUnchangableNameMemberList } from "../actions/userActions";
+import secretChannelCommands from "../commands/secretChannelCommands";
+import { Client, Guild, Role } from "discord.js";
+import syncUnchangableNameMemberList from "../actions/syncActions/syncUnchangableNameMemberList";
+import roleMeCommand from "../commands/roleMeCommand";
 
 const constants = require("../constants/constants.json");
 
@@ -17,7 +17,7 @@ export function interactionCreate(
 
     const { commandName } = interaction;
     const channelName = interaction.channel.name;
-    const authorUsername = interaction.member.user.username;
+    const authorUsername: string = interaction.member.user.username;
     const server: Guild = interaction.guild!;
 
     syncUnchangableNameMemberList(server, unchangableNameMemberList);
@@ -41,7 +41,7 @@ export function interactionCreate(
         );
         return;
       }
-      secretChannelResponses(
+      secretChannelCommands(
         commandName,
         interaction,
         server,

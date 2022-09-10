@@ -1,5 +1,5 @@
 import { Client, Guild, Role } from "discord.js";
-import { syncRolesToBeAssigned } from "../actions/roleActions";
+import syncRolesToBeAssigned from "../actions/syncActions/syncRolesToBeAssigned";
 
 export function roleUpdate(
   client: Client,

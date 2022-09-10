@@ -1,8 +1,7 @@
 import { Guild, GuildMember, Role } from "discord.js";
+const constants = require("../../constants/constants.json");
 
-const constants = require("../constants/constants.json");
-
-export function syncUnchangableNameMemberList(
+export default function syncUnchangableNameMemberList(
   server: Guild,
   unchangableNameMemberList: string[]
 ) {

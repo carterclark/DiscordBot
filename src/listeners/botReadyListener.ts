@@ -1,8 +1,8 @@
 import { Channel, Client, Guild, Role } from "discord.js";
 import { schedule } from "node-cron";
-import { syncChannelNameToChannels } from "../actions/channelActions";
-import { syncRolesToBeAssigned } from "../actions/roleActions";
-import { syncUnchangableNameMemberList } from "../actions/userActions";
+import syncChannelNameToChannels from "../actions/syncActions/syncChannelNameToChannels";
+import syncRolesToBeAssigned from "../actions/syncActions/syncRolesToBeAssigned";
+import syncUnchangableNameMemberList from "../actions/syncActions/syncUnchangableNameMemberList";
 
 const constants = require("../constants/constants.json");
 const dotenv = require("dotenv");
@@ -21,7 +21,6 @@ export function ready(
     if (!client.user || !client.application) {
       return;
     }
-
     const server = client.guilds.cache.get(String(process.env.SERVER_ID))!;
 
     syncUnchangableNameMemberList(server, unchangableNameMemberList);
@@ -45,15 +44,20 @@ export function ready(
       constants.botLogChannelName
     );
     logChannel.send(logString);
+
+    // take roles: January 1st
+    const springCron = `0 0 18 10 1 * *`; // Spring Start: January 10th
+
+    // take roles: May 10th
+    const summerCron = `0 0 18 14 5 * *`; // Summer Start: May 14th
+
+    // take roles: August 20th
+    const fallCron = `0 0 18 22 8 * *`; // Fall Start: Augest 22nd
+
+    setupScheduledMessage(channelNamesToChannels, springCron);
+    setupScheduledMessage(channelNamesToChannels, summerCron);
+    setupScheduledMessage(channelNamesToChannels, fallCron);
   });
-
-  const springCron = `0 0 18 10 1 * *`; //Spring: January 10th
-  const summerCron = `0 0 18 14 5 * *`; //Summer: May 14th
-  const fallCron = `0 0 18 22 8 * *`; //Fall: Augest 22nd
-
-  setupScheduledMessage(channelNamesToChannels, springCron);
-  setupScheduledMessage(channelNamesToChannels, summerCron);
-  setupScheduledMessage(channelNamesToChannels, fallCron);
 }
 
 function setupScheduledMessage(
@@ -62,7 +66,7 @@ function setupScheduledMessage(
 ) {
   schedule(
     cronString,
-    function jobYouNeedToExecute() {
+    function scheduledJob() {
       const announcementsChannel: any =
         channelNamesToChannels.get(`announcements`);
 

@@ -26,7 +26,7 @@
 
 ## Workflow
 
-### function testing checklist
+### functional testing checklist
 
 1. role_me in authorization: carter ICS 140, ICS-141, ICS342, ICS 460, ics-141, data211, ics-140, ics 365
 2. take_roles, info, and class_list in secret-secret
@@ -36,6 +36,12 @@
 1. git add .
 2. git commit -m"[COMMIT MESSAGE]"
 3. git push
+
+### commands
+
+- yarn start
+- yarn commands
+- ts-prune
 
 ## Technology
 
