@@ -1,7 +1,7 @@
 import { CommandInteraction, Role } from "discord.js";
-const constants = require("../constants/constants.json");
+const constants = require("../../constants/constants.json");
 
-export default function getStatString(
+export default function getRoleStatsString(
   rolesToBeAssigned: string[],
   interaction: CommandInteraction
 ) {

@@ -1,10 +1,10 @@
 import { Role } from "discord.js";
-import insertionSort from "../util/insertionSort";
-const constants = require("../constants/constants.json");
+import insertionSort from "../../util/insertionSort";
+const constants = require("../../constants/constants.json");
 
-export default function getRoleNamesSorted(
+export default function getRolesSortedString(
   roleNamesToRoles: Map<string, Role>
-) {
+): String {
   let roleArray: String[] = [];
   let roleString: String = ``;
 

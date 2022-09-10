@@ -1,5 +1,5 @@
 import { GuildMember, Role } from "discord.js";
-const constants = require("../constants/constants.json");
+const constants = require("../../constants/constants.json");
 import roleIsInMemberCache from "./roleIsInMemberCache";
 
 export default function checkAndAddDefaultRoles(

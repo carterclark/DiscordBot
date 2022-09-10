@@ -1,9 +1,9 @@
 import { CommandInteraction, Role, Guild } from "discord.js";
 import roleMeCommand from "./roleMeCommand";
-import getRoleNamesSorted from "../actions/getRoleNamesSorted";
+import getRolesSortedString from "../actions/roleActions/getRolesSortedString";
 import syncRolesToBeAssigned from "../actions/syncActions/syncRolesToBeAssigned";
 const constants = require("../constants/constants.json");
-import getStatString from "../actions/getStatString";
+import getRoleStatsString from "../actions/roleActions/getRoleStatsString";
 import takeRolesCommand from "./takeRolesCommand";
 
 export default async function secretChannelCommands(
@@ -39,7 +39,7 @@ export default async function secretChannelCommands(
     }
 
     case `info`: {
-      const statString = getStatString(rolesToBeAssigned, interaction);
+      const statString = getRoleStatsString(rolesToBeAssigned, interaction);
 
       await interaction.reply(
         `classPrefixList: [${classPrefixList}]\n` +
@@ -51,7 +51,7 @@ export default async function secretChannelCommands(
     }
     case `list_roles`: {
       await interaction.reply(
-        `roles listed: ${getRoleNamesSorted(roleNamesToRoles)}`
+        `roles listed: ${getRolesSortedString(roleNamesToRoles)}`
       );
       break;
     }

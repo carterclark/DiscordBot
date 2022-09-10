@@ -1,6 +1,6 @@
 import { CommandInteraction, Role, GuildMember } from "discord.js";
-import roleIsInMemberCache from "../actions/roleIsInMemberCache";
-import checkAndAddDefaultRoles from "../actions/checkAndAddDefaultRoles";
+import roleIsInMemberCache from "../actions/roleActions/roleIsInMemberCache";
+import checkAndAddDefaultRoles from "../actions/roleActions/checkAndAddDefaultRoles";
 import formatClassNames from "../util/formatClassNames";
 import hasClassPrefix from "../util/hasClassPrefix";
 
