@@ -1,8 +1,8 @@
 import { CommandInteraction, Role, GuildMember } from "discord.js";
 import roleIsInMemberCache from "../actions/roleActions/roleIsInMemberCache";
 import checkAndAddDefaultRoles from "../actions/roleActions/checkAndAddDefaultRoles";
-import formatClassNames from "../util/formatClassNames";
-import hasClassPrefix from "../util/hasClassPrefix";
+import formatClassNames from "../util/classUtil/formatClassNames";
+import hasClassPrefix from "../util/classUtil/hasClassPrefix";
 
 export default async function roleMeCommand(
   interaction: CommandInteraction,

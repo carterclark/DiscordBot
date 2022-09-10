@@ -1,8 +1,9 @@
-import { Channel, Client, Guild, Role } from "discord.js";
-import { schedule } from "node-cron";
+import { Channel, Client, Role } from "discord.js";
 import syncChannelNameToChannels from "../actions/syncActions/syncChannelNameToChannels";
 import syncRolesToBeAssigned from "../actions/syncActions/syncRolesToBeAssigned";
 import syncUnchangableNameMemberList from "../actions/syncActions/syncUnchangableNameMemberList";
+import setupScheduledMessage from "../util/scheduleUtil/setupScheduledMessage";
+import fetchRestrictedRoleMentions from "../actions/roleActions/fetchRestrictedRoleMentions";
 
 const constants = require("../constants/constants.json");
 const dotenv = require("dotenv");
@@ -31,7 +32,7 @@ export function ready(
       classPrefixList
     );
     syncChannelNameToChannels(server, channelNamesToChannels);
-    fetchRestrictedMentions(server, restrictedMentionIdToRoles);
+    fetchRestrictedRoleMentions(server, restrictedMentionIdToRoles);
 
     const logString: string =
       `${client.user.username} initialized on server: ${
@@ -57,41 +58,5 @@ export function ready(
     setupScheduledMessage(channelNamesToChannels, springCron);
     setupScheduledMessage(channelNamesToChannels, summerCron);
     setupScheduledMessage(channelNamesToChannels, fallCron);
-  });
-}
-
-function setupScheduledMessage(
-  channelNamesToChannels: Map<String, Channel>,
-  cronString: string
-) {
-  schedule(
-    cronString,
-    function scheduledJob() {
-      const announcementsChannel: any =
-        channelNamesToChannels.get(`announcements`);
-
-      announcementsChannel.send(
-        `@everyone Hey guys, this is you're once in a ` +
-          `semester reminder to please plug the discord in ` +
-          `your classes. We'd appreciate it. 🙏` +
-          `\n\nSomething that the mods have done in the past is just pasting the link in the zoom chat.`
-      );
-    },
-    {
-      timezone: "America/Mexico_City",
-    }
-  );
-}
-
-function fetchRestrictedMentions(
-  server: Guild,
-  restrictedMentionNameToRoles: Map<string, Role>
-) {
-  const rolesToBeRestricted: String[] = constants.restrictedRoleNames;
-
-  server?.roles.cache.forEach((role: Role) => {
-    if (rolesToBeRestricted.includes(role.name)) {
-      restrictedMentionNameToRoles.set(role.id, role);
-    }
   });
 }
