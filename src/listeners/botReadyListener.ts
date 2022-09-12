@@ -1,7 +1,7 @@
 import { Channel, Client, Role } from "discord.js";
 import syncChannelNameToChannels from "../actions/syncActions/syncChannelNameToChannels";
 import syncRolesToBeAssigned from "../actions/syncActions/syncRolesToBeAssigned";
-import syncUnchangableNameMemberList from "../actions/syncActions/syncUnchangableNameMemberList";
+import syncUnchangeableNameMemberList from "../actions/syncActions/syncUnchangeableNameMemberList";
 import setupScheduledMessage from "../util/scheduleUtil/setupScheduledMessage";
 import fetchRestrictedRoleMentions from "../actions/roleActions/fetchRestrictedRoleMentions";
 
@@ -11,7 +11,7 @@ dotenv.config();
 
 export function ready(
   client: Client,
-  unchangableNameMemberList: string[],
+  unchangeableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
   rolesToBeAssigned: string[],
   classPrefixList: string[],
@@ -24,7 +24,7 @@ export function ready(
     }
     const server = client.guilds.cache.get(String(process.env.SERVER_ID))!;
 
-    syncUnchangableNameMemberList(server, unchangableNameMemberList);
+    syncUnchangeableNameMemberList(server, unchangeableNameMemberList);
     syncRolesToBeAssigned(
       server,
       roleNamesToRoles,
@@ -37,7 +37,7 @@ export function ready(
     const logString: string =
       `${client.user.username} initialized on server: ${
         server!.name
-      }\nunchangableNameMemberList: [${unchangableNameMemberList}]\nclassPrefixList: [${classPrefixList}]` +
+      }\nunchangeableNameMemberList: [${unchangeableNameMemberList}]\nclassPrefixList: [${classPrefixList}]` +
       `\nrolesToBeAssigned: [${rolesToBeAssigned}]`;
 
     console.log(logString);

@@ -10,7 +10,7 @@ dotenv.config();
 
 let roleNamesToRoles: Map<string, Role> = new Map();
 let rolesToBeAssigned: string[] = [];
-let unchangableNameMemberList: string[] = [];
+let unchangeableNameMemberList: string[] = [];
 let classPrefixList: string[] = [];
 let restrictedMentionIdToRoles: Map<string, Role> = new Map();
 let channelNamesToChannels: Map<String, Channel> = new Map();
@@ -26,7 +26,7 @@ const client = new Client({
 
 ready(
   client,
-  unchangableNameMemberList,
+  unchangeableNameMemberList,
   roleNamesToRoles,
   rolesToBeAssigned,
   classPrefixList,
@@ -36,12 +36,12 @@ ready(
 roleUpdate(client, roleNamesToRoles, rolesToBeAssigned, classPrefixList);
 interactionCreate(
   client,
-  unchangableNameMemberList,
+  unchangeableNameMemberList,
   roleNamesToRoles,
   rolesToBeAssigned,
   classPrefixList
 );
-messageCreate(client, restrictedMentionIdToRoles, unchangableNameMemberList);
+messageCreate(client, restrictedMentionIdToRoles, unchangeableNameMemberList);
 
 uncaughtException(process, client);
 client.login(process.env.BOT_AUTH_TOKEN);

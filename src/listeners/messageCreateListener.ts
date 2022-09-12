@@ -5,7 +5,7 @@ const constants = require("../constants/constants.json");
 export function messageCreate(
   client: Client,
   restrictedMentionIdToRoles: Map<string, Role>,
-  unchangableNameMemberList: string[]
+  unchangeableNameMemberList: string[]
 ): void {
   client.on(`messageCreate`, async (message: any) => {
     const channelName = message.channel.name as string;
@@ -16,14 +16,14 @@ export function messageCreate(
     restrictedMentionIdArray.push(constants.everyoneRole);
 
     if (
-      !unchangableNameMemberList.includes(message.author.username) &&
+      !unchangeableNameMemberList.includes(message.author.username) &&
       messageHasRestrictedMention(restrictedMentionIdArray, message.content)
     ) {
       message.delete();
       message.channel.send(
-        `${message.author}Looks like you tried to mention a role that will bother alot of people. ` +
+        `${message.author}Looks like you tried to mention a role that will bother allot of people. ` +
           `If you're in a class channel you can @ that class role, otherwise if you want to make ` +
-          `an anouncement please @ the moderators for help.`
+          `an announcement please @ the moderators for help.`
       );
     } else if (
       !message.author.bot &&

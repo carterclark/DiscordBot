@@ -7,7 +7,7 @@ import hasClassPrefix from "../util/classUtil/hasClassPrefix";
 export default async function roleMeCommand(
   interaction: CommandInteraction,
   authorUsername: string,
-  unchangableNameMemberList: string[],
+  unchangeableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
   rolesToBeAssigned: string[],
   classPrefixList: string[]
@@ -16,7 +16,7 @@ export default async function roleMeCommand(
   const member = interaction.member as GuildMember;
   const nameFromMessage = interaction.options.getString("name", true);
 
-  let splitMessageSpaceSeperated: string[] = classes.split(" ");
+  let splitMessageSpaceSeparated: string[] = classes.split(" ");
 
   console.log(`\nrole_me call initiated for ${authorUsername}`);
   let rolesToBeAdded: Role[] = [];
@@ -30,15 +30,15 @@ export default async function roleMeCommand(
     roleNamesAdded
   );
 
-  let splitMessageCommaSeperated = splitMessageSpaceSeperated
+  let splitMessageCommaSeparated = splitMessageSpaceSeparated
     .join("")
     .split(",");
 
   // go through and edit every class name without a dash
-  formatClassNames(splitMessageCommaSeperated);
+  formatClassNames(splitMessageCommaSeparated);
 
   //assign roles
-  for (const messageElement of splitMessageCommaSeperated) {
+  for (const messageElement of splitMessageCommaSeparated) {
     const messageElementUpper = messageElement.toUpperCase();
 
     // this is a recognized role
@@ -70,7 +70,7 @@ export default async function roleMeCommand(
   console.log(`Adding roles [${roleNamesAdded}] to ${authorUsername}`);
 
   let personName = nameFromMessage;
-  if (unchangableNameMemberList.includes(authorUsername)) {
+  if (unchangeableNameMemberList.includes(authorUsername)) {
     personName = `couldn't change nickname to "${nameFromMessage}", role is above the bot`;
   } else {
     member.setNickname(nameFromMessage);

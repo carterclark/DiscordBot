@@ -1,13 +1,13 @@
 import secretChannelCommands from "../commands/secretChannelCommands";
 import { Client, Guild, Role } from "discord.js";
-import syncUnchangableNameMemberList from "../actions/syncActions/syncUnchangableNameMemberList";
+import syncUnchangeableNameMemberList from "../actions/syncActions/syncUnchangeableNameMemberList";
 import roleMeCommand from "../commands/roleMeCommand";
 
 const constants = require("../constants/constants.json");
 
 export function interactionCreate(
   client: Client,
-  unchangableNameMemberList: string[],
+  unchangeableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
   rolesToBeAssigned: string[],
   classPrefixList: string[]
@@ -20,7 +20,7 @@ export function interactionCreate(
     const authorUsername: string = interaction.member.user.username;
     const server: Guild = interaction.guild!;
 
-    syncUnchangableNameMemberList(server, unchangableNameMemberList);
+    syncUnchangeableNameMemberList(server, unchangeableNameMemberList);
 
     if (
       channelName === constants.authChannelName &&
@@ -29,13 +29,13 @@ export function interactionCreate(
       roleMeCommand(
         interaction,
         authorUsername,
-        unchangableNameMemberList,
+        unchangeableNameMemberList,
         roleNamesToRoles,
         rolesToBeAssigned,
         classPrefixList
       );
     } else if (channelName === constants.secretChannelName) {
-      if (!unchangableNameMemberList.includes(authorUsername)) {
+      if (!unchangeableNameMemberList.includes(authorUsername)) {
         await interaction.reply(
           "Commands in this channel are only enabled for mods"
         );
@@ -45,7 +45,7 @@ export function interactionCreate(
         commandName,
         interaction,
         server,
-        unchangableNameMemberList,
+        unchangeableNameMemberList,
         roleNamesToRoles,
         rolesToBeAssigned,
         classPrefixList,

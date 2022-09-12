@@ -10,7 +10,7 @@ export default async function secretChannelCommands(
   commandName: String,
   interaction: CommandInteraction,
   server: Guild,
-  unchangableNameMemberList: string[],
+  unchangeableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
   rolesToBeAssigned: string[],
   classPrefixList: string[],
@@ -44,7 +44,7 @@ export default async function secretChannelCommands(
       await interaction.reply(
         `classPrefixList: [${classPrefixList}]\n` +
           `topRoles: [${constants.topRoles}]\n` +
-          `unchangableNameMemberList(updated): [${unchangableNameMemberList}]\n` +
+          `unchangeableNameMemberList(updated): [${unchangeableNameMemberList}]\n` +
           `ROLE STATS\n${statString}`
       );
       break;
@@ -59,7 +59,7 @@ export default async function secretChannelCommands(
       roleMeCommand(
         interaction,
         authorUsername,
-        unchangableNameMemberList,
+        unchangeableNameMemberList,
         roleNamesToRoles,
         rolesToBeAssigned,
         classPrefixList
