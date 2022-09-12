@@ -51,13 +51,13 @@ export default function readyListener(
     const summerCronMessage = `0 0 18 14 5 * *`; // 6PM May 14th
     const fallCronMessage = `0 0 18 22 8 * *`; // 6PM August 22nd
 
-    setupScheduledMessage(channelNamesToChannels, springCronMessage);
-    setupScheduledMessage(channelNamesToChannels, summerCronMessage);
-    setupScheduledMessage(channelNamesToChannels, fallCronMessage);
-
     const springCronTakeRoles = `0 0 6 1 1 * *`; // 6AM January 1st
     const summerCronTakeRoles = `0 0 6 10 5 * *`; // 6AM May 10th
     const fallCronTakeRoles = `0 0 6 20 8 * *`; // 6AM August 20nd
+
+    setupScheduledMessage(channelNamesToChannels, springCronMessage);
+    setupScheduledMessage(channelNamesToChannels, summerCronMessage);
+    setupScheduledMessage(channelNamesToChannels, fallCronMessage);
 
     setupScheduledTakeRoles(
       server,

@@ -26,4 +26,5 @@ export default function setupScheduledTakeRoles(
       timezone: "America/Mexico_City",
     }
   );
+  console.log(`Scheduled take roles on ${cronString}`);
 }

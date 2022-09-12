@@ -22,4 +22,5 @@ export default function setupScheduledMessage(
       timezone: "America/Mexico_City",
     }
   );
+  console.log(`Scheduled announcement on ${cronString}`);
 }
