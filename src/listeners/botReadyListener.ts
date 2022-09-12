@@ -2,9 +2,9 @@ import { Channel, Client, Role } from "discord.js";
 import syncChannelNameToChannels from "../actions/syncActions/syncChannelNameToChannels";
 import syncRolesToBeAssigned from "../actions/syncActions/syncRolesToBeAssigned";
 import syncUnchangeableNameMemberList from "../actions/syncActions/syncUnchangeableNameMemberList";
-import setupScheduledMessage from "../util/scheduleUtil/setupScheduledMessage";
+import setupScheduledMessage from "../schedulers/setupScheduledMessage";
 import fetchRestrictedRoleMentions from "../actions/roleActions/fetchRestrictedRoleMentions";
-import setupScheduledTakeRoles from "src/util/scheduleUtil/setupScheduleTakeRoles";
+import setupScheduledTakeRoles from "../schedulers/setupScheduleTakeRoles";
 
 const constants = require("../constants/constants.json");
 const dotenv = require("dotenv");

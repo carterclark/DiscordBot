@@ -1,6 +1,6 @@
 import { Channel, Guild } from "discord.js";
 import { schedule } from "node-cron";
-import takeRolesCommand from "src/commands/takeRolesCommand";
+import takeRolesCommand from "../commands/takeRolesCommand";
 
 export default function setupScheduledTakeRoles(
   server: Guild,

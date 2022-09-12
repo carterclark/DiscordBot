@@ -1,5 +1,5 @@
 import { Guild, Role } from "discord.js";
-import { addToClassPrefixList } from "../../util/classUtil/addToClassPrefixList";
+import addToClassPrefixList from "../../util/classUtil/addToClassPrefixList";
 const constants = require("../../constants/constants.json");
 
 export default function syncRolesToBeAssigned(
