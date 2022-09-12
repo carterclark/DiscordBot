@@ -5,7 +5,7 @@ import roleMeCommand from "../commands/roleMeCommand";
 
 const constants = require("../constants/constants.json");
 
-export function interactionCreate(
+export default function interactionCreateListener(
   client: Client,
   unchangeableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,

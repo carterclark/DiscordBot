@@ -1,7 +1,7 @@
 import { Client, Guild, Role } from "discord.js";
 import syncRolesToBeAssigned from "../actions/syncActions/syncRolesToBeAssigned";
 
-export function roleUpdate(
+export default function roleUpdateListener(
   client: Client,
   roleNamesToRoles: Map<string, Role>,
   rolesToBeAssigned: string[],

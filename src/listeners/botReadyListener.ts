@@ -4,12 +4,13 @@ import syncRolesToBeAssigned from "../actions/syncActions/syncRolesToBeAssigned"
 import syncUnchangeableNameMemberList from "../actions/syncActions/syncUnchangeableNameMemberList";
 import setupScheduledMessage from "../util/scheduleUtil/setupScheduledMessage";
 import fetchRestrictedRoleMentions from "../actions/roleActions/fetchRestrictedRoleMentions";
+import setupScheduledTakeRoles from "src/util/scheduleUtil/setupScheduleTakeRoles";
 
 const constants = require("../constants/constants.json");
 const dotenv = require("dotenv");
 dotenv.config();
 
-export function ready(
+export default function readyListener(
   client: Client,
   unchangeableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
@@ -46,17 +47,47 @@ export function ready(
     );
     logChannel.send(logString);
 
-    // take roles: January 1st
-    const springCron = `0 0 18 10 1 * *`; // Spring Start: January 10th
+    const springCronMessage = `0 0 18 10 1 * *`; // 6PM January 10th
+    const summerCronMessage = `0 0 18 14 5 * *`; // 6PM May 14th
+    const fallCronMessage = `0 0 18 22 8 * *`; // 6PM August 22nd
 
-    // take roles: May 10th
-    const summerCron = `0 0 18 14 5 * *`; // Summer Start: May 14th
+    setupScheduledMessage(channelNamesToChannels, springCronMessage);
+    setupScheduledMessage(channelNamesToChannels, summerCronMessage);
+    setupScheduledMessage(channelNamesToChannels, fallCronMessage);
 
-    // take roles: August 20th
-    const fallCron = `0 0 18 22 8 * *`; // Fall Start: Augest 22nd
+    const springCronTakeRoles = `0 0 6 1 1 * *`; // 6AM January 1st
+    const summerCronTakeRoles = `0 0 6 10 5 * *`; // 6AM May 10th
+    const fallCronTakeRoles = `0 0 6 20 8 * *`; // 6AM August 20nd
 
-    setupScheduledMessage(channelNamesToChannels, springCron);
-    setupScheduledMessage(channelNamesToChannels, summerCron);
-    setupScheduledMessage(channelNamesToChannels, fallCron);
+    setupScheduledTakeRoles(
+      server,
+      rolesToBeAssigned,
+      channelNamesToChannels,
+      springCronTakeRoles
+    );
+    setupScheduledTakeRoles(
+      server,
+      rolesToBeAssigned,
+      channelNamesToChannels,
+      summerCronTakeRoles
+    );
+    setupScheduledTakeRoles(
+      server,
+      rolesToBeAssigned,
+      channelNamesToChannels,
+      fallCronTakeRoles
+    );
   });
 }
+
+// Fall End: December 11th
+// take roles: January 1st
+// Spring Start: January 10th
+
+// Spring End: May 3rd
+// take roles: May 10th
+// Summer Start: May 14th
+
+// Summer End: August 14th
+// take roles: August 20th
+// Fall Start: August 22nd

@@ -1,4 +1,4 @@
-export function addToClassPrefixList(
+export default function addToClassPrefixList(
   roleName: String,
   classPrefixList: String[]
 ) {

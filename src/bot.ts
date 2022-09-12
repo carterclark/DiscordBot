@@ -1,9 +1,9 @@
-import { interactionCreate } from "./listeners/interactionCreateListener";
-import { ready } from "./listeners/botReadyListener";
-import { roleUpdate } from "./listeners/roleUpdateListener";
-import { uncaughtException } from "./listeners/uncaughtExceptionListener";
+import interactionCreateListener from "./listeners/interactionCreateListener";
+import readyListener from "./listeners/botReadyListener";
+import roleUpdateListener from "./listeners/roleUpdateListener";
+import uncaughtExceptionListener from "./listeners/uncaughtExceptionListener";
 import { Channel, Client, Intents, Role } from "discord.js";
-import { messageCreate } from "./listeners/messageCreateListener";
+import messageCreateListener from "./listeners/messageCreateListener";
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -24,7 +24,7 @@ const client = new Client({
   ],
 });
 
-ready(
+readyListener(
   client,
   unchangeableNameMemberList,
   roleNamesToRoles,
@@ -33,15 +33,24 @@ ready(
   restrictedMentionIdToRoles,
   channelNamesToChannels
 );
-roleUpdate(client, roleNamesToRoles, rolesToBeAssigned, classPrefixList);
-interactionCreate(
+roleUpdateListener(
+  client,
+  roleNamesToRoles,
+  rolesToBeAssigned,
+  classPrefixList
+);
+interactionCreateListener(
   client,
   unchangeableNameMemberList,
   roleNamesToRoles,
   rolesToBeAssigned,
   classPrefixList
 );
-messageCreate(client, restrictedMentionIdToRoles, unchangeableNameMemberList);
+messageCreateListener(
+  client,
+  restrictedMentionIdToRoles,
+  unchangeableNameMemberList
+);
 
-uncaughtException(process, client);
+uncaughtExceptionListener(process, client);
 client.login(process.env.BOT_AUTH_TOKEN);

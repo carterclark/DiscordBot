@@ -1,17 +1,18 @@
-import { CommandInteraction, GuildMember, Role } from "discord.js";
+import { Collection, GuildMember, Role } from "discord.js";
 const constants = require("../constants/constants.json");
 
 export default async function takeRolesCommand(
-  interaction: CommandInteraction,
-  rolesToBeAssigned: string[]
-) {
+  membersCache: Collection<string, GuildMember>,
+  rolesToBeAssigned: string[],
+  serverName: string
+): Promise<string> {
   let classRoleTakenCount = 0;
   let userWithRoleTakenCount = 0;
   let userNotCounted: boolean;
   let rolesToBeRemoved: Role[] = [];
   let rolesRemovedNames: string[] = [];
 
-  interaction.guild!.members.cache.forEach((member: GuildMember) => {
+  membersCache.forEach((member: GuildMember) => {
     userNotCounted = true;
     member.roles.cache.forEach((role: Role) => {
       if (
@@ -39,8 +40,8 @@ export default async function takeRolesCommand(
     }
   });
 
-  await interaction.reply(
+  return (
     `take_roles removed ${classRoleTakenCount} class roles from ${userWithRoleTakenCount} users` +
-      ` in ${interaction!.guild!.name}`
+    ` in ${serverName}`
   );
 }

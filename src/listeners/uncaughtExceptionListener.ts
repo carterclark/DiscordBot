@@ -3,7 +3,7 @@ import findChannelByName from "../actions/findChannelByName";
 
 const constants = require("../constants/constants.json");
 
-export function uncaughtException(
+export default function uncaughtExceptionListener(
   process: NodeJS.Process,
   client: Client
 ): void {

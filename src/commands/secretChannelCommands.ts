@@ -30,7 +30,12 @@ export default async function secretChannelCommands(
           rolesToBeAssigned,
           classPrefixList
         );
-        takeRolesCommand(interaction, rolesToBeAssigned);
+        const takeRolesResultString: string = await takeRolesCommand(
+          interaction.guild!.members.cache,
+          rolesToBeAssigned,
+          interaction!.guild!.name
+        );
+        await interaction.reply(takeRolesResultString);
       } else {
         await interaction.reply(`roles not taken`);
       }

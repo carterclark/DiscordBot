@@ -2,7 +2,7 @@ import { Client, Role } from "discord.js";
 
 const constants = require("../constants/constants.json");
 
-export function messageCreate(
+export default function messageCreateListener(
   client: Client,
   restrictedMentionIdToRoles: Map<string, Role>,
   unchangeableNameMemberList: string[]
