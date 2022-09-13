@@ -14,7 +14,7 @@ export default function messageCreateListener(
     );
     // adding because message shows @everyone for everyone mention but shows ID for other roles mentioned
     restrictedMentionIdArray.push(constants.everyoneRole);
-
+    console.log(`message content: ${message.content}`);
     if (
       !unchangeableNameMemberList.includes(message.author.username) &&
       messageHasRestrictedMention(restrictedMentionIdArray, message.content)
@@ -28,7 +28,8 @@ export default function messageCreateListener(
     } else if (
       !message.author.bot &&
       channelName === constants.authChannelName &&
-      message.content.startsWith(`/role_me`)
+      (message.content.startsWith(`/role_me`) ||
+        message.content.startsWith(`<@`))
     ) {
       return message.reply(
         `You need to type out /role_me and then select ` +
