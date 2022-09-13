@@ -14,7 +14,6 @@ export default function messageCreateListener(
     );
     // adding because message shows @everyone for everyone mention but shows ID for other roles mentioned
     restrictedMentionIdArray.push(constants.everyoneRole);
-    console.log(`message content: ${message.content}`);
     if (
       !unchangeableNameMemberList.includes(message.author.username) &&
       messageHasRestrictedMention(restrictedMentionIdArray, message.content)
