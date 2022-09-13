@@ -24,12 +24,12 @@ const commands = [
   new SlashCommandBuilder()
     .setName("list_roles")
     .setDescription("Replies with a sorted list of roles in the server"),
-  new SlashCommandBuilder()
-    .setName("take_roles")
-    .setDescription("takes all class roles from everyone")
-    .addStringOption((option) =>
-      option.setName("yes_or_no").setDescription("confirm").setRequired(true)
-    ),
+  // new SlashCommandBuilder()
+  //   .setName("take_roles")
+  //   .setDescription("takes all class roles from everyone")
+  //   .addStringOption((option) =>
+  //     option.setName("yes_or_no").setDescription("confirm").setRequired(true)
+  //   ),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: "9" }).setToken(process.env.BOT_AUTH_TOKEN);

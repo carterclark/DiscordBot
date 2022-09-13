@@ -44,7 +44,6 @@ export default function interactionCreateListener(
       secretChannelCommands(
         commandName,
         interaction,
-        server,
         unchangeableNameMemberList,
         roleNamesToRoles,
         rolesToBeAssigned,

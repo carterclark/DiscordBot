@@ -1,15 +1,12 @@
-import { CommandInteraction, Role, Guild } from "discord.js";
+import { CommandInteraction, Role } from "discord.js";
 import roleMeCommand from "./roleMeCommand";
 import getRolesSortedString from "../actions/roleActions/getRolesSortedString";
-import syncRolesToBeAssigned from "../actions/syncActions/syncRolesToBeAssigned";
 const constants = require("../constants/constants.json");
 import getRoleStatsString from "../actions/roleActions/getRoleStatsString";
-import takeRolesCommand from "./takeRolesCommand";
 
 export default async function secretChannelCommands(
   commandName: String,
   interaction: CommandInteraction,
-  server: Guild,
   unchangeableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
   rolesToBeAssigned: string[],
@@ -21,27 +18,27 @@ export default async function secretChannelCommands(
       await interaction.reply(`Pong!`);
       break;
 
-    case `take_roles`: {
-      const message = interaction.options.getString("yes_or_no", true);
-      if (message.toUpperCase() === `YES`) {
-        syncRolesToBeAssigned(
-          server,
-          roleNamesToRoles,
-          rolesToBeAssigned,
-          classPrefixList
-        );
-        const takeRolesResultString: string = await takeRolesCommand(
-          interaction.guild!.members.cache,
-          rolesToBeAssigned,
-          interaction!.guild!.name
-        );
-        await interaction.reply(takeRolesResultString);
-      } else {
-        await interaction.reply(`roles not taken`);
-      }
+    // case `take_roles`: {
+    //   const message = interaction.options.getString("yes_or_no", true);
+    //   if (message.toUpperCase() === `YES`) {
+    //     syncRolesToBeAssigned(
+    //       server,
+    //       roleNamesToRoles,
+    //       rolesToBeAssigned,
+    //       classPrefixList
+    //     );
+    //     const takeRolesResultString: string = await takeRolesCommand(
+    //       interaction.guild!.members.cache,
+    //       rolesToBeAssigned,
+    //       interaction!.guild!.name
+    //     );
+    //     await interaction.reply(takeRolesResultString);
+    //   } else {
+    //     await interaction.reply(`roles not taken`);
+    //   }
 
-      break;
-    }
+    //   break;
+    // }
 
     case `info`: {
       const statString = getRoleStatsString(rolesToBeAssigned, interaction);
