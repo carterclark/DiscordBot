@@ -1,5 +1,6 @@
 import { Channel } from "discord.js";
 import { schedule } from "node-cron";
+const constants = require("../constants/constants.json");
 
 export default function setupScheduledMessage(
   channelNamesToChannels: Map<String, Channel>,
@@ -8,8 +9,9 @@ export default function setupScheduledMessage(
   schedule(
     cronString,
     function scheduledJob() {
-      const announcementsChannel: any =
-        channelNamesToChannels.get(`announcements`);
+      const announcementsChannel: any = channelNamesToChannels.get(
+        constants.announcementChannelName
+      );
 
       announcementsChannel.send(
         `@everyone Hey guys, this is you're once in a ` +

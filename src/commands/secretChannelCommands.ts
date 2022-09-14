@@ -63,8 +63,7 @@ export default async function secretChannelCommands(
         authorUsername,
         unchangeableNameMemberList,
         roleNamesToRoles,
-        rolesToBeAssigned,
-        classPrefixList
+        rolesToBeAssigned
       );
     }
   }

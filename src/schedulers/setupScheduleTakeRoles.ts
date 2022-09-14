@@ -1,6 +1,7 @@
 import { Channel, Guild } from "discord.js";
 import { schedule } from "node-cron";
 import takeRolesCommand from "../commands/takeRolesCommand";
+const constants = require("../constants/constants.json");
 
 export default function setupScheduledTakeRoles(
   server: Guild,
@@ -11,7 +12,9 @@ export default function setupScheduledTakeRoles(
   schedule(
     cronString,
     async function scheduledJob() {
-      const botLogsChannel: any = channelNamesToChannels.get(`bot-logs`);
+      const announcementsChannel: any = channelNamesToChannels.get(
+        constants.announcementChannelName
+      );
 
       // take roles command
       const takeRolesResultString: string = await takeRolesCommand(
@@ -20,7 +23,7 @@ export default function setupScheduledTakeRoles(
         server.name
       );
 
-      botLogsChannel.send(takeRolesResultString);
+      announcementsChannel.send(takeRolesResultString);
     },
     {
       timezone: "America/Mexico_City",

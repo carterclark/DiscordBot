@@ -2,23 +2,20 @@ import { CommandInteraction, Role, GuildMember } from "discord.js";
 import roleIsInMemberCache from "../actions/roleActions/roleIsInMemberCache";
 import checkAndAddDefaultRoles from "../actions/roleActions/checkAndAddDefaultRoles";
 import formatClassNames from "../util/classUtil/formatClassNames";
-import hasClassPrefix from "../util/classUtil/hasClassPrefix";
 
 export default async function roleMeCommand(
   interaction: CommandInteraction,
   authorUsername: string,
   unchangeableNameMemberList: string[],
   roleNamesToRoles: Map<string, Role>,
-  rolesToBeAssigned: string[],
-  classPrefixList: string[]
+  rolesToBeAssigned: string[]
 ) {
+  console.log(`\nrole_me call initiated for ${authorUsername}`);
+
   const classes = interaction.options.getString("classes", true);
   const member = interaction.member as GuildMember;
   const nameFromMessage = interaction.options.getString("name", true);
 
-  let splitMessageSpaceSeparated: string[] = classes.split(" ");
-
-  console.log(`\nrole_me call initiated for ${authorUsername}`);
   let rolesToBeAdded: Role[] = [];
   let roleNamesAdded: string[] = [];
   let rolesSkipped: string[] = [];
@@ -30,9 +27,7 @@ export default async function roleMeCommand(
     roleNamesAdded
   );
 
-  let splitMessageCommaSeparated = splitMessageSpaceSeparated
-    .join("")
-    .split(",");
+  let splitMessageCommaSeparated = classes.split(" ").join("").split(",");
 
   // go through and edit every class name without a dash
   formatClassNames(splitMessageCommaSeparated);
@@ -43,10 +38,9 @@ export default async function roleMeCommand(
 
     // this is a recognized role
     if (rolesToBeAssigned.includes(messageElementUpper)) {
-      let roleToBeAdded: Role = roleNamesToRoles.get(messageElementUpper)!;
-
       // role is recognized as a role to be assigned and member does not have it
       if (!roleIsInMemberCache(member, messageElementUpper)) {
+        let roleToBeAdded: Role = roleNamesToRoles.get(messageElementUpper)!;
         rolesToBeAdded.push(roleToBeAdded);
         roleNamesAdded.push(roleToBeAdded.name);
       }
@@ -56,11 +50,7 @@ export default async function roleMeCommand(
         rolesSkipped.push(messageElementUpper);
       }
     }
-    // not a recognized role but has a class prefix
-    else if (hasClassPrefix(messageElement, classPrefixList)) {
-      rolesSkipped.push(messageElementUpper);
-    }
-    // element is not recognized with a class prefix
+    // element is not recognized as a class in the server index
     else {
       rolesSkipped.push(messageElement);
     }

@@ -31,8 +31,7 @@ export default function interactionCreateListener(
         authorUsername,
         unchangeableNameMemberList,
         roleNamesToRoles,
-        rolesToBeAssigned,
-        classPrefixList
+        rolesToBeAssigned
       );
     } else if (channelName === constants.secretChannelName) {
       if (!unchangeableNameMemberList.includes(authorUsername)) {
