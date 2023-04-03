@@ -47,35 +47,36 @@ export default function readyListener(
     );
     logChannel.send(logString);
 
-    const springCronMessage = `0 0 18 10 1 * *`; // 6PM January 10th
-    const summerCronMessage = `0 0 18 14 5 * *`; // 6PM May 14th
-    const fallCronMessage = `0 0 18 22 8 * *`; // 6PM August 22nd
-
-    const springCronTakeRoles = `0 0 6 1 1 * *`; // 6AM January 1st
-    const summerCronTakeRoles = `0 0 6 10 5 * *`; // 6AM May 10th
-    const fallCronTakeRoles = `0 0 6 20 8 * *`; // 6AM August 20nd
-
-    setupScheduledMessage(channelNamesToChannels, springCronMessage);
-    setupScheduledMessage(channelNamesToChannels, summerCronMessage);
-    setupScheduledMessage(channelNamesToChannels, fallCronMessage);
+    setupScheduledMessage(
+      channelNamesToChannels,
+      constants.cronSchedules.springCronMessage
+    );
+    setupScheduledMessage(
+      channelNamesToChannels,
+      constants.cronSchedules.summerCronMessage
+    );
+    setupScheduledMessage(
+      channelNamesToChannels,
+      constants.cronSchedules.fallCronMessage
+    );
 
     setupScheduledTakeRoles(
       server,
       rolesToBeAssigned,
       channelNamesToChannels,
-      springCronTakeRoles
+      constants.cronSchedules.springCronTakeRoles
     );
     setupScheduledTakeRoles(
       server,
       rolesToBeAssigned,
       channelNamesToChannels,
-      summerCronTakeRoles
+      constants.cronSchedules.summerCronTakeRoles
     );
     setupScheduledTakeRoles(
       server,
       rolesToBeAssigned,
       channelNamesToChannels,
-      fallCronTakeRoles
+      constants.cronSchedules.fallCronTakeRoles
     );
   });
 }

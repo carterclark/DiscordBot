@@ -18,5 +18,13 @@
   "announcementChannelName": "announcements",
   "messageRoleFormat": "'/role_me [YOUR NAME] [CLASS-1], [CLASS-2], ...'",
   "roleMeCommand": "role_me",
-  "restrictedRoleNames": ["Current_Student", "Person", "@everyone"]
+  "restrictedRoleNames": ["Current_Student", "Person", "@everyone"],
+  "cronSchedules": {
+    "springCronMessage": "0 0 18 10 1 * *",
+    "summerCronMessage": "0 0 18 14 5 * *",
+    "fallCronMessage": "0 0 18 22 8 * *",
+    "springCronTakeRoles": "0 0 6 1 1 * *",
+    "summerCronTakeRoles": "0 0 6 10 5 * *",
+    "fallCronTakeRoles": "0 0 6 20 8 * *"
+  }
 }
