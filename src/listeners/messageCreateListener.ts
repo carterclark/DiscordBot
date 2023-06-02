@@ -27,8 +27,7 @@ export default function messageCreateListener(
     } else if (
       !message.author.bot &&
       channelName === constants.authChannelName &&
-      (message.content.startsWith(`/role_me`) ||
-        message.content.startsWith(`<@`))
+      message.content.startsWith(`/role_me`)
     ) {
       return message.reply(
         `You need to type out /role_me and then select ` +
